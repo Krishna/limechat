@@ -113,6 +113,7 @@
 		78F475930F15022000D05115 /* ns_user_defaults.rb in Resources */ = {isa = PBXBuildFile; fileRef = 78F475920F15022000D05115 /* ns_user_defaults.rb */; };
 		8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MainMenu.nib */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
+		D71928370FB22E01000D7B5D /* debug_tools.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71928360FB22E01000D7B5D /* debug_tools.rb */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -233,6 +234,7 @@
 		78F475920F15022000D05115 /* ns_user_defaults.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = ns_user_defaults.rb; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* MRLimeChat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MRLimeChat.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D71928360FB22E01000D7B5D /* debug_tools.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = debug_tools.rb; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -443,6 +445,7 @@
 				78B4B3FD0ED932CA00622588 /* userdefaultsaccess.rb */,
 				78B4B3FE0ED932CA00622588 /* utility.rb */,
 				78B4B3FF0ED932CA00622588 /* wildcard.rb */,
+				D71928360FB22E01000D7B5D /* debug_tools.rb */,
 			);
 			name = lib;
 			path = ruby/lib;
@@ -630,6 +633,7 @@
 				78A376990F1720E6002CD1A4 /* abstract_preferences.rb in Resources */,
 				78A376AA0F1726BF002CD1A4 /* redstar.tiff in Resources */,
 				78A376AB0F1726BF002CD1A4 /* bluestar.tiff in Resources */,
+				D71928370FB22E01000D7B5D /* debug_tools.rb in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

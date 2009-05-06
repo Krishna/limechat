@@ -367,8 +367,10 @@ class IRCUnit < NSObject
     end
     true
   end
-  
+    
   def send_command(s, complete_target=true, target=nil)
+	# DebugTools.log_send_command(s, complete_target, target)
+	
     return false unless connected? && s && !s.include?("\0")
     s = s.dup
     command = s.token!
@@ -426,11 +428,7 @@ class IRCUnit < NSObject
     when :query
       target = s.token!
       if target.empty?
-        # close the current talk
-        c = @world.selchannel
-        if c && c.talk?
-          @world.destroy_channel(c)
-        end
+		print_both(self, :error_reply, "query command needs a nick parameter. It will open a new window and start a private chat.") 
       else
         # open a new talk
         c = find_channel(target)
