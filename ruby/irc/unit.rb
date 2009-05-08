@@ -369,7 +369,7 @@ class IRCUnit < NSObject
   end
     
   def send_command(s, complete_target=true, target=nil)
-	# DebugTools.log_send_command(s, complete_target, target)
+	DebugTools.log_send_command(s, complete_target, target)
 	
     return false unless connected? && s && !s.include?("\0")
     s = s.dup
@@ -397,11 +397,12 @@ class IRCUnit < NSObject
       else
         begin
           result = eval(s).inspect
-        rescue SyntaxError => e
-          
+        rescue SyntaxError => e          
+		      send_text(c, :privmsg, "syntax error >> #{s}")
         rescue Exception => e
-          send_text(c, :privmsg, ">> #{s}")
-          send_text(c, :privmsg, "=> #{result}")
+	        send_text(c, :privmsg, "exception #{e} >> #{s}")
+        else
+		      send_text(c, :privmsg, "=> #{result}")
         end
       end
       return true
