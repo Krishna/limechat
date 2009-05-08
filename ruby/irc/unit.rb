@@ -368,6 +368,30 @@ class IRCUnit < NSObject
     true
   end
     
+  def resolve_aliases(cmd)    
+    opmsg = false
+    actual_cmd = cmd
+    
+    case cmd
+    when :omsg
+      opmsg = true
+      actual_cmd = :privmsg
+    when :onotice
+      opmsg = true
+      actual_cmd = :notice
+    when :msg,:m
+      actual_cmd = :privmsg
+    when :leave
+      actual_cmd = :part
+    when :j
+      actual_cmd = :join
+    when :t
+      actual_cmd = :topic
+    end
+
+    return [opmsg, actual_cmd]
+  end  
+    
   def send_command(s, complete_target=true, target=nil)
 	DebugTools.log_send_command(s, complete_target, target)
 	
@@ -386,9 +410,10 @@ class IRCUnit < NSObject
       sel = nil
     end
     
-    opmsg = false
-    
-    # parse pseudo commands and alias
+    opmsg = false    
+    opmsg, cmd = resolve_aliases(cmd)
+        
+    # parse pseudo commands
     case cmd
     when :ruby
       c = @world.selchannel || self
@@ -468,20 +493,6 @@ class IRCUnit < NSObject
         join_channel(c, pass, true)
       end
       return true
-    when :omsg
-      opmsg = true
-      cmd = :privmsg
-    when :onotice
-      opmsg = true
-      cmd = :notice
-    when :msg,:m
-      cmd = :privmsg
-    when :leave
-      cmd = :part
-    when :j
-      cmd = :join
-    when :t
-      cmd = :topic
     when :raw,:quote
       send_raw(s.token!, s)
       return true
