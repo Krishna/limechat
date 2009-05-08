@@ -391,29 +391,13 @@ class IRCUnit < NSObject
 
     return [opmsg, actual_cmd]
   end  
-    
-  def send_command(s, complete_target=true, target=nil)
-	DebugTools.log_send_command(s, complete_target, target)
-	
-    return false unless connected? && s && !s.include?("\0")
-    s = s.dup
-    command = s.token!
-    return false if command.empty?
-    cmd = command.downcase.to_sym
-    target = nil
-    
-    if complete_target && target
-      sel = target
-    elsif complete_target && @world.selunit == self && @world.selchannel
-      sel = @world.selchannel
-    else
-      sel = nil
-    end
-    
-    opmsg = false    
-    opmsg, cmd = resolve_aliases(cmd)
-        
-    # parse pseudo commands
+
+=begin
+  Checks cmd to see if it a psuedocommand. 
+  If cmd is a psuedocommand it is handled and the method returns: true.
+  Otherwise, returns false.
+=end
+  def handle_pseudo_command(cmd, s)
     case cmd
     when :ruby
       c = @world.selchannel || self
@@ -454,7 +438,7 @@ class IRCUnit < NSObject
     when :query
       target = s.token!
       if target.empty?
-		print_both(self, :error_reply, "query command needs a nick parameter. It will open a new window and start a private chat.") 
+		    print_both(self, :error_reply, "query command needs a nick parameter. It will open a new window and start a private chat.") 
       else
         # open a new talk
         c = find_channel(target)
@@ -496,7 +480,33 @@ class IRCUnit < NSObject
     when :raw,:quote
       send_raw(s.token!, s)
       return true
+    end    
+    
+    return false
+  end
+    
+  def send_command(s, complete_target=true, target=nil)
+	DebugTools.log_send_command(s, complete_target, target)
+	
+    return false unless connected? && s && !s.include?("\0")
+    s = s.dup
+    command = s.token!
+    return false if command.empty?
+    cmd = command.downcase.to_sym
+    target = nil
+    
+    if complete_target && target
+      sel = target
+    elsif complete_target && @world.selunit == self && @world.selchannel
+      sel = @world.selchannel
+    else
+      sel = nil
     end
+    
+    opmsg = false    
+    opmsg, cmd = resolve_aliases(cmd)
+        
+    return true if handle_pseudo_command(cmd, s)    
     
     # get target if needed
     case cmd
