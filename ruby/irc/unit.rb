@@ -495,13 +495,13 @@ class IRCUnit < NSObject
     cmd = command.downcase.to_sym
     target = nil
     
-    if complete_target && target
-      sel = target
-    elsif complete_target && @world.selunit == self && @world.selchannel
-      sel = @world.selchannel
-    else
-      sel = nil
-    end
+    sel = if complete_target && target
+            target
+          elsif complete_target && @world.selunit == self && @world.selchannel
+            @world.selchannel
+          else
+            nil
+          end
     
     opmsg = false    
     opmsg, cmd = resolve_aliases(cmd)
