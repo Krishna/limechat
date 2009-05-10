@@ -387,23 +387,37 @@ class IRCUnit < NSObject
     return sel
   end
 
-  def send_command(s, complete_target=true, target=nil)
-  	DebugTools.log_send_command(s, complete_target, target)
-	
-    return false unless connected? && s && !s.include?("\0")
-    
-    s = s.dup
-    command = s.token!
-    return false if command.empty?
-    
-    cmd = command.downcase.to_sym
-    
-    target = nil
-    sel = pick_sel(complete_target, target)
-    
+
+  def resolve_aliases(cmd)    
     opmsg = false
+    actual_cmd = cmd
     
-    # parse pseudo commands and alias
+    case cmd
+    when :omsg
+      opmsg = true
+      actual_cmd = :privmsg
+    when :onotice
+      opmsg = true
+      actual_cmd = :notice
+    when :msg,:m
+      actual_cmd = :privmsg
+    when :leave
+      actual_cmd = :part
+    when :j
+      actual_cmd = :join
+    when :t
+      actual_cmd = :topic
+    end
+
+    return [opmsg, actual_cmd]
+  end  
+
+=begin
+  Checks cmd to see if it a psuedocommand. 
+  If cmd is a psuedocommand it is handled and the method returns: true.
+  Otherwise, returns false.
+=end
+  def handle_pseudo_command(cmd, s)
     case cmd
     when :ruby
       c = @world.selchannel || self
@@ -413,11 +427,11 @@ class IRCUnit < NSObject
         begin
           result = eval(s).inspect
         rescue SyntaxError => e          
-          send_text(c, :privmsg, "syntax error >> #{s}")
+		      send_text(c, :privmsg, "syntax error >> #{s}")
         rescue Exception => e
-          send_text(c, :privmsg, "exception #{e} >> #{s}")
+	        send_text(c, :privmsg, "exception #{e} >> #{s}")
         else
-          send_text(c, :privmsg, "=> #{result}")
+		      send_text(c, :privmsg, "=> #{result}")
         end
       end
       return true
@@ -442,9 +456,9 @@ class IRCUnit < NSObject
       end
       return true
     when :query
-      target = s.token! 
+      target = s.token!
       if target.empty?
-        print_both(self, :error_reply, "query command needs a nick parameter. It will open a new window and start a private chat.")         
+		    print_both(self, :error_reply, "query command needs a nick parameter. It will open a new window and start a private chat.") 
       else
         # open a new talk
         c = find_channel(target)
@@ -483,119 +497,92 @@ class IRCUnit < NSObject
         join_channel(c, pass, true)
       end
       return true
-    when :omsg
-      opmsg = true
-      cmd = :privmsg
-    when :onotice
-      opmsg = true
-      cmd = :notice
-    when :msg,:m
-      cmd = :privmsg
-    when :leave
-      cmd = :part
-    when :j
-      cmd = :join
-    when :t
-      cmd = :topic
     when :raw,:quote
       send_raw(s.token!, s)
       return true
-    end
-    
-    # get target if needed
+    end    
+
+    return false
+  end
+
+
+  # side-effects on: s
+  def get_target(cmd, s, opmsg, sel)
     case cmd
     when :privmsg,:notice,:action
       if opmsg
         if sel && sel.channel? && !s.channelname?
-          target = sel.name
+          return sel.name
         else
-          target = s.token!
+          return s.token!
         end
       else
-        target = s.token!
+        return s.token!
       end
     when :me
       cmd = :action
       if sel
-        target = sel.name
+        return sel.name
       else
-        target = s.token!
+        return s.token!
       end
     when :part
       if sel && sel.channel? && !s.channelname?
-        target = sel.name
-      elsif sel && sel.talk? && !s.channelname?
-        @world.destroy_channel(sel)
+        return sel.name
       else
-        target = s.token!
+        return s.token!
       end
     when :topic
       if sel && sel.channel? && !s.channelname?
-        target = sel.name
+        return sel.name
       else
-        target = s.token!
+        return s.token!
       end
     when :mode,:kick
       if sel && sel.channel? && !s.modechannelname?
-        target = sel.name
+        return sel.name
       else
-        target = s.token!
+        return s.token!
       end
     when :join
       if sel && sel.channel? && !sel.active? && s.empty?
-        target = sel.name
+        return sel.name
       else
         target = s.token!
         target = '#' + target unless target.channelname?
+        return target
       end
     when :invite
-      target = s.token!
+      return s.token!
     when :op,:deop,:halfop,:dehalfop,:voice,:devoice,:ban,:unban
       if sel && sel.channel? && !s.modechannelname?
-        target = sel.name
+        return sel.name
       else
-        target = s.token!
-      end
-      command = cmd.to_s
-      if command =~ /^(de|un)/
-        sign = '-'
-        command[0..1] = ''
-      else
-        sign = '+'
-      end
-      params = s.split(/ +/)
-      if params.empty?
-        if cmd == :ban
-          s = '+b'
-        else
-          return true
-        end
-      else
-        s = sign + command[0,1] * params.size + ' ' + s
-      end
-      cmd = :mode
-    when :umode
-      cmd = :mode
-      s = @mynick
+        return s.token!
+      end    
     end
-    
-    # cut colon
+  end
+
+  def cut_colon!(s)
     if s[0] == ?:
-      cut_colon = true
       s[0] = ''
-    else
-      cut_colon = false
+      return true
     end
-    
-    # process text commands
+    return false
+  end
+
+
+  # side-effect: s, target
+  def process_text_commands(cmd, s, target)
     if cmd == :privmsg || cmd == :notice
       if s[0] == 0x1
-        cmd = cmd == :privmsg ? :ctcp : :ctcpreply
+        cmd = (cmd == :privmsg) ? :ctcp : :ctcpreply
         s[0] = ''
         n = s.index("\x01")
         s = s[0...n] if n
       end
     end
+
     if cmd == :ctcp
       t = s.dup
       subcmd = t.token!
@@ -606,23 +593,26 @@ class IRCUnit < NSObject
       end
     end
 
-    # finally action
+    return [cmd, target]
+  end
+
+  def action_cmd(cmd, s, target, opmsg, cut_colon)
     case cmd
     when :privmsg,:notice,:action
       return false unless target
       return false if s.empty?
       s = to_local_encoding(to_common_encoding(s))
-      
+
       loop do
         break if s.empty?
         t = truncate_text(s, cmd, target)
         break if t.empty?
-        
+
         targets = target.split(/,/)
-        
+
         targets.each do |chname|
           next if chname.empty?
-          
+
           # support for @#channel
           #
           if chname =~ /^@/
@@ -631,13 +621,13 @@ class IRCUnit < NSObject
           else
             op_prefix = false
           end
-          
+
           c = find_channel(chname)
           if !c && !chname.channelname? && !eq(chname, 'NickServ') && !eq(chname, 'ChanServ')
             c = @world.create_talk(self, chname)
           end
           print_both(c || chname, cmd, @mynick, t)
-          
+
           # support for @#channel and omsg/onotice
           #
           if chname.channelname?
@@ -646,15 +636,15 @@ class IRCUnit < NSObject
             end
           end
         end
-        
+
         if cmd == :action
           cmd = :privmsg
           t = "\x01ACTION #{t}\x01"
         end
-        
+
         send(cmd, targets.join(','), t)
       end
-    
+
     when :ctcp
       subcmd = s.token!
       unless subcmd.empty?
@@ -696,8 +686,73 @@ class IRCUnit < NSObject
     else
       s = ':' + s if cut_colon
       send_raw(cmd, s)
-    end
+    end  
+
     true
+  end
+
+  def send_command(s, complete_target=true, target=nil)
+  	DebugTools.log_send_command(s, complete_target, target)
+	
+    return false unless connected? && s && !s.include?("\0")
+    
+    s = s.dup
+    command = s.token!
+    return false if command.empty?
+    
+    cmd = command.downcase.to_sym
+    
+    target = nil
+    sel = pick_sel(complete_target, target)
+    
+    opmsg = false
+    opmsg, cmd = resolve_aliases(cmd)    
+    
+    return true if handle_pseudo_command(cmd, s)      
+    
+    ## special case, from get_target:    
+    if cmd == :part
+      if sel && sel.channel? && !s.channelname?
+      elsif sel && sel.talk? && !s.channelname?
+        @world.destroy_channel(sel)
+      else
+      end
+    end
+
+    target = get_target(cmd, s, opmsg, sel) # note... this method will mutate s
+    
+    ## special case, from get_target:
+    case cmd
+    when :op,:deop,:halfop,:dehalfop,:voice,:devoice,:ban,:unban
+      command = cmd.to_s
+      if command =~ /^(de|un)/
+        sign = '-'
+        command[0..1] = ''
+      else
+        sign = '+'
+      end
+      params = s.split(/ +/)
+      if params.empty?
+        if cmd == :ban
+          s = '+b'
+        else
+          return true
+        end
+      else
+        s = sign + command[0,1] * params.size + ' ' + s
+      end
+      cmd = :mode
+    when :umode
+      cmd = :mode
+      s = @mynick      
+    end
+    
+    cut_colon = cut_colon!(s)        
+    
+    cmd, target = process_text_commands(cmd, s, target)
+
+    return action_cmd(cmd, s, target, opmsg, cut_colon)            
+    
   end
   
   
