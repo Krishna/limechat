@@ -405,11 +405,11 @@ class IRCUnit < NSObject
         begin
           result = eval(s).inspect
         rescue SyntaxError => e          
-		      send_text(c, :privmsg, "syntax error >> #{s}")
+          send_text(c, :privmsg, "syntax error >> #{s}")
         rescue Exception => e
-	        send_text(c, :privmsg, "exception #{e} >> #{s}")
+          send_text(c, :privmsg, "exception #{e} >> #{s}")
         else
-		      send_text(c, :privmsg, "=> #{result}")
+          send_text(c, :privmsg, "=> #{result}")
         end
       end
       return true
