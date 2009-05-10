@@ -374,24 +374,32 @@ class IRCUnit < NSObject
     end
     true
   end
-  
+
+
+  def pick_sel(complete_target, target)
+    sel = if complete_target && target
+            target
+          elsif complete_target && @world.selunit == self && @world.selchannel
+            @world.selchannel
+          else
+            nil
+          end
+    return sel
+  end
+
   def send_command(s, complete_target=true, target=nil)
-  	# DebugTools.log_send_command(s, complete_target, target)
+  	DebugTools.log_send_command(s, complete_target, target)
 	
     return false unless connected? && s && !s.include?("\0")
+    
     s = s.dup
     command = s.token!
     return false if command.empty?
-    cmd = command.downcase.to_sym
-    target = nil
     
-    if complete_target && target
-      sel = target
-    elsif complete_target && @world.selunit == self && @world.selchannel
-      sel = @world.selchannel
-    else
-      sel = nil
-    end
+    cmd = command.downcase.to_sym
+    
+    target = nil
+    sel = pick_sel(complete_target, target)
     
     opmsg = false
     
