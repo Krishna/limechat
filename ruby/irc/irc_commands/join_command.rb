@@ -11,7 +11,7 @@ class JoinCommand
   def command_and_aliases
     c = "/#{command}"
     a = aliases.collect {|a| "/#{a}" }
-    [c, a].join (' | ')
+    [c, a].join(' | ')
   end
   
   def aliases
