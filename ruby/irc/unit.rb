@@ -393,31 +393,33 @@ class IRCUnit < NSObject
     actual_cmd = cmd
     
     case cmd
-    when :omsg
-      opmsg = true
-      actual_cmd = :privmsg
     when :onotice
       opmsg = true
       actual_cmd = :notice
-    when :msg,:m
-      actual_cmd = :privmsg
-    when :leave
-      actual_cmd = :part
     when :j
       actual_cmd = :join
     when :t
       actual_cmd = :topic
+    when :omsg
+      opmsg = true
+      actual_cmd = :privmsg
+    when :msg,:m
+      actual_cmd = :privmsg
     end
 
     return [opmsg, actual_cmd]
   end  
+
+  def channel_is_selected?(sel)
+    sel && sel.channel?
+  end
 
   # side-effects on: s
   def get_target(cmd, s, opmsg, sel)
     case cmd
     when :privmsg,:notice,:action
       if opmsg
-        if sel && sel.channel? && !s.channelname?
+        if channel_is_selected?(sel) && !s.channelname?
           return sel.name
         else
           return s.token!
@@ -432,26 +434,20 @@ class IRCUnit < NSObject
       else
         return s.token!
       end
-    when :part
-      if sel && sel.channel? && !s.channelname?
-        return sel.name
-      else
-        return s.token!
-      end
     when :topic
-      if sel && sel.channel? && !s.channelname?
+      if channel_is_selected?(sel) && !s.channelname?
         return sel.name
       else
         return s.token!
       end
     when :mode,:kick
-      if sel && sel.channel? && !s.modechannelname?
+      if channel_is_selected?(sel) && !s.modechannelname?
         return sel.name
       else
         return s.token!
       end
     when :join
-      if sel && sel.channel? && !sel.active? && s.empty?
+      if channel_is_selected?(sel) && !sel.active? && s.empty?
         return sel.name
       else
         target = s.token!
@@ -461,7 +457,7 @@ class IRCUnit < NSObject
     when :invite
       return s.token!
     when :op,:deop,:halfop,:dehalfop,:voice,:devoice,:ban,:unban
-      if sel && sel.channel? && !s.modechannelname?
+      if channel_is_selected?(sel) && !s.modechannelname?
         return sel.name
       else
         return s.token!
@@ -574,8 +570,6 @@ class IRCUnit < NSObject
       else
         send(cmd, target, s)
       end
-    when :part
-      send(cmd, target, s)
     when :kick
       peer = s.token!
       send(:kick, target, peer, s)
@@ -623,6 +617,13 @@ class IRCUnit < NSObject
     return QueryCommand.new(self) if cmd == :query
     
     # TODO: other, non-psuedo-commands to follow...
+    return PartCommand.new(self, :invoked_command => cmd) if (cmd == :part || cmd == :leave)
+    
+    
+=begin
+    return PrivMsgCommand
+=end    
+    
     
     return nil
   end
@@ -675,15 +676,6 @@ class IRCUnit < NSObject
     opmsg = false
     opmsg, cmd = resolve_aliases(cmd)    
          
-    ## special case, from get_target:    
-    if cmd == :part
-      if sel && sel.channel? && !s.channelname?
-      elsif sel && sel.talk? && !s.channelname?
-        @world.destroy_channel(sel)
-      else
-      end
-    end
-
     target = get_target(cmd, s, opmsg, sel) # note... this method will mutate s
     
     ## special case, from get_target:
