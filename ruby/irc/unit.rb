@@ -423,13 +423,6 @@ class IRCUnit < NSObject
       else
         return s.token!
       end
-    when :me
-      cmd = :action
-      if sel
-        return sel.name
-      else
-        return s.token!
-      end
     when :mode,:kick
       if channel_is_selected?(sel) && !s.modechannelname?
         return sel.name
@@ -595,7 +588,8 @@ class IRCUnit < NSObject
     # TODO: other, non-psuedo-commands to follow...
     return PartCommand.new(self, :invoked_command => cmd) if (cmd == :part || cmd == :leave)
     return TopicCommand.new(self, :invoked_command => cmd) if (cmd == :topic || cmd == :t)
-    return JoinCommand.new(self, :invoked_command => cmd) if (cmd == :join || cmd == :j)    
+    return JoinCommand.new(self, :invoked_command => cmd) if (cmd == :join || cmd == :j)
+    return MeCommand.new(self) if (cmd == :me)    
     
 =begin
     return PrivMsgCommand
@@ -1033,7 +1027,9 @@ class IRCUnit < NSObject
   end
   
   
-  private
+
+public
+  # made following two methods public for use by command objects...
   
   def to_common_encoding(s)
     return s.dup if @encoding == NSUTF8StringEncoding
@@ -1055,6 +1051,8 @@ class IRCUnit < NSObject
     s = KanaSupport::to_iso2022(s) if enc == NSISO2022JPStringEncoding
     NSString.stringWithCString_encoding(s, enc).to_s
   end
+
+private
   
   def reload_tree
     @world.reload_tree
