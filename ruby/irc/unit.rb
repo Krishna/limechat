@@ -398,8 +398,6 @@ class IRCUnit < NSObject
       actual_cmd = :notice
     when :j
       actual_cmd = :join
-    when :t
-      actual_cmd = :topic
     when :omsg
       opmsg = true
       actual_cmd = :privmsg
@@ -430,12 +428,6 @@ class IRCUnit < NSObject
     when :me
       cmd = :action
       if sel
-        return sel.name
-      else
-        return s.token!
-      end
-    when :topic
-      if channel_is_selected?(sel) && !s.channelname?
         return sel.name
       else
         return s.token!
@@ -564,12 +556,6 @@ class IRCUnit < NSObject
       quit(s)
     when :nick
       change_nick(s.token!)
-    when :topic
-      if s.empty? && !cut_colon
-        send(cmd, target)
-      else
-        send(cmd, target, s)
-      end
     when :kick
       peer = s.token!
       send(:kick, target, peer, s)
@@ -618,7 +604,7 @@ class IRCUnit < NSObject
     
     # TODO: other, non-psuedo-commands to follow...
     return PartCommand.new(self, :invoked_command => cmd) if (cmd == :part || cmd == :leave)
-    
+    return TopicCommand.new(self, :invoked_command => cmd) if (cmd == :topic || cmd == :t)    
     
 =begin
     return PrivMsgCommand
