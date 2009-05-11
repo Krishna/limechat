@@ -125,6 +125,7 @@
 		D75C8F390FB8A8F100511320 /* topic_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D75C8F380FB8A8F100511320 /* topic_command.rb */; };
 		D75C8F3C0FB8AEC500511320 /* join_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D75C8F3B0FB8AEC500511320 /* join_command.rb */; };
 		D75C8F3F0FB8B9FF00511320 /* me_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D75C8F3E0FB8B9FF00511320 /* me_command.rb */; };
+		D75C8F500FB8DC7300511320 /* kick_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D75C8F4F0FB8DC7300511320 /* kick_command.rb */; };
 		D77D15AE0FB243C20037801C /* debug_tools.rb in Resources */ = {isa = PBXBuildFile; fileRef = D77D15AD0FB243C20037801C /* debug_tools.rb */; };
 /* End PBXBuildFile section */
 
@@ -271,6 +272,7 @@
 		D75C8F380FB8A8F100511320 /* topic_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = topic_command.rb; sourceTree = "<group>"; };
 		D75C8F3B0FB8AEC500511320 /* join_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = join_command.rb; sourceTree = "<group>"; };
 		D75C8F3E0FB8B9FF00511320 /* me_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = me_command.rb; sourceTree = "<group>"; };
+		D75C8F4F0FB8DC7300511320 /* kick_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = kick_command.rb; sourceTree = "<group>"; };
 		D77D15AD0FB243C20037801C /* debug_tools.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = debug_tools.rb; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -555,6 +557,7 @@
 		D71683ED0FB85E13003AC56D /* irc_commands */ = {
 			isa = PBXGroup;
 			children = (
+				D75C8F4F0FB8DC7300511320 /* kick_command.rb */,
 				D75C8F3E0FB8B9FF00511320 /* me_command.rb */,
 				D75C8F3B0FB8AEC500511320 /* join_command.rb */,
 				D75C8F380FB8A8F100511320 /* topic_command.rb */,
@@ -719,6 +722,7 @@
 				D75C8F390FB8A8F100511320 /* topic_command.rb in Resources */,
 				D75C8F3C0FB8AEC500511320 /* join_command.rb in Resources */,
 				D75C8F3F0FB8B9FF00511320 /* me_command.rb in Resources */,
+				D75C8F500FB8DC7300511320 /* kick_command.rb in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
