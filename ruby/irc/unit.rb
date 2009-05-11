@@ -423,8 +423,6 @@ class IRCUnit < NSObject
       else
         return s.token!
       end
-    when :invite
-      return s.token!
     when :op,:deop,:halfop,:dehalfop,:voice,:devoice,:ban,:unban
       if channel_is_selected?(sel) && !s.modechannelname?
         return sel.name
@@ -535,8 +533,6 @@ class IRCUnit < NSObject
       change_nick(s.token!)
     when :away
       send(cmd, s)
-    when :invite
-      send(cmd, target, s)
     when :whois
       if s.include?(' ')
         send(cmd, s)
@@ -581,7 +577,8 @@ class IRCUnit < NSObject
     return TopicCommand.new(self, :invoked_command => cmd) if (cmd == :topic || cmd == :t)
     return JoinCommand.new(self, :invoked_command => cmd) if (cmd == :join || cmd == :j)
     return MeCommand.new(self) if (cmd == :me)
-    return KickCommand.new(self) if (cmd == :kick)        
+    return KickCommand.new(self) if (cmd == :kick)
+    return InviteCommand.new(self) if (cmd == :invite)            
     
 =begin
     return PrivMsgCommand
