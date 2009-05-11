@@ -412,100 +412,6 @@ class IRCUnit < NSObject
     return [opmsg, actual_cmd]
   end  
 
-=begin
-  Checks cmd to see if it a psuedocommand. 
-  If cmd is a psuedocommand it is handled and the method returns: true.
-  Otherwise, returns false.
-=end
-  def handle_pseudo_command(cmd, s)
-    case cmd
-    when :ruby
-      c = @world.selchannel || self
-      if s.empty?
-        print_both(c, :error_reply, "Input ruby expressions to execute")
-      else
-        begin
-          result = eval(s).inspect
-        rescue SyntaxError => e          
-		      send_text(c, :privmsg, "syntax error >> #{s}")
-        rescue Exception => e
-	        send_text(c, :privmsg, "exception #{e} >> #{s}")
-        else
-		      send_text(c, :privmsg, "=> #{result}")
-        end
-      end
-      return true
-		when :clear
-			u, c = @world.sel
-			if c
-				c.log.clear
-			elsif u
-				u.log.clear
-			end
-			return true
-    when :weights
-      sel = @world.selchannel
-      if sel
-        print_both(self, :reply, "WEIGHTS: ") 
-        sel.members.each do |m|
-          if m.weight > 0
-            out = "#{m.nick} - sent: #{m.incoming_weight} received: #{m.outgoing_weight} total: #{m.weight}" 
-            print_both(self, :reply, out) 
-          end
-        end
-      end
-      return true
-    when :query
-      target = s.token!
-      if target.empty?
-		    print_both(self, :error_reply, "query command needs a nick parameter. It will open a new window and start a private chat.") 
-      else
-        # open a new talk
-        c = find_channel(target)
-        unless c
-          @world.clear_text
-          c = @world.create_talk(self, target)
-        end
-        @world.select(c)
-      end
-      return true
-    when :close
-      target = s.token!
-      if target.empty?
-        c = @world.selchannel
-      else
-        c = find_channel(target)
-      end
-      if c && c.talk?
-        @world.destroy_channel(c)
-      end
-      return true
-    when :timer
-      interval = s.token!
-      if interval =~ /^\d+$/
-        @timer_queue << [interval.to_i, sel, s]
-      else
-        print_both(self, :error_reply, "timer command needs interval as a number") 
-      end
-      return true
-    when :rejoin,:hop,:cycle
-      c = @world.selchannel
-      if c
-        pass = c.mode.k
-        pass = nil if pass.empty?
-        part_channel(c)
-        join_channel(c, pass, true)
-      end
-      return true
-    when :raw,:quote
-      send_raw(s.token!, s)
-      return true
-    end    
-
-    return false
-  end
-
-
   # side-effects on: s
   def get_target(cmd, s, opmsg, sel)
     case cmd
@@ -691,10 +597,71 @@ class IRCUnit < NSObject
     true
   end
 
+
+  # timed_command should be an array of the form:
+  #   [interval (integer), sel, cmd_to_execute (string)]
+  def add_timed_command(timed_command)
+    @timer_queue << timed_command
+  end
+
+=begin rdoc
+  For a given symbol (cmd), returns the corresponding command object.
+  Returns nil if the symbol is not recognised
+=end
+  def all_outbound_commands(cmd)
+    
+    # the following are 'psuedo-commands'...    
+    
+    return ClearCommand.new(self) if cmd == :clear
+    return CloseCommand.new(self) if cmd == :close
+    return RawCommand.new(self, :invoked_command => cmd) if (cmd == :raw || cmd == :quote)
+      # TODO: resolve command aliases for the RejoinCommand earlier...
+    return RejoinCommand.new(self, :invoked_command => cmd) if ((cmd == :rejoin) || (cmd == :hop) || (cmd == :cycle))
+    return RubyCommand.new(self) if cmd == :ruby
+    return TimerCommand.new(self) if cmd == :timer    
+    return WeightsCommand.new(self) if cmd == :weights
+    return QueryCommand.new(self) if cmd == :query
+    
+    # TODO: other, non-psuedo-commands to follow...
+    
+    return nil
+  end
+
+=begin rdoc
+  Tries to dispatch an outbound command. 
+
+  Returns: [command_was_recognised, command_return_code]
+    command_was_recognised - a boolean to indicate if the command was recognised and dispatched.
+    command_return_code - the return code from the command, if a command was dispatched. nil otherwise.    
+=end
+  def dispatch_outbound_command(cmd_string, complete_target=true, target=nil)
+    DebugTools.log_dispatch_outbound_command(cmd_string, complete_target, target)
+    	
+    cmd_string = cmd_string.dup
+    cmd = cmd_string.token!
+    cmd = cmd.downcase.to_sym
+    
+    printf("cmd: %s | cmd_string: %s\n", cmd, cmd_string)
+    	
+    cmd_to_execute = all_outbound_commands(cmd)
+    if cmd_to_execute
+      sel = pick_sel(complete_target, target)
+      command_result = cmd_to_execute.execute(cmd_string, complete_target, target, sel)
+      return [true, command_result]
+    end
+    	
+    return [false, nil]
+  end
+
   def send_command(s, complete_target=true, target=nil)
   	DebugTools.log_send_command(s, complete_target, target)
 	
     return false unless connected? && s && !s.include?("\0")
+    
+    command_was_handled, command_return_code = dispatch_outbound_command(s, complete_target, target)
+    return command_return_code if command_was_handled
+    
+    # command was not handled by the dispatcher, so carry on...
     
     s = s.dup
     command = s.token!
@@ -707,9 +674,7 @@ class IRCUnit < NSObject
     
     opmsg = false
     opmsg, cmd = resolve_aliases(cmd)    
-    
-    return true if handle_pseudo_command(cmd, s)      
-    
+         
     ## special case, from get_target:    
     if cmd == :part
       if sel && sel.channel? && !s.channelname?
@@ -1281,6 +1246,10 @@ class IRCUnit < NSObject
     end
     key
   end
+
+public
+  
+  # Made print_both public, so that the command objects can use it.
   
   def print_both(channel, kind, nick, text=nil, identified=nil)
     r = print_channel(channel, kind, nick, text, identified)
@@ -1289,6 +1258,8 @@ class IRCUnit < NSObject
     end
     r
   end
+
+private
   
   def print_system(channel, text)
     print_channel(channel, :system, text)
