@@ -423,12 +423,6 @@ class IRCUnit < NSObject
       else
         return s.token!
       end
-    when :mode
-      if channel_is_selected?(sel) && !s.modechannelname?
-        return sel.name
-      else
-        return s.token!
-      end
     when :invite
       return s.token!
     when :op,:deop,:halfop,:dehalfop,:voice,:devoice,:ban,:unban
@@ -541,7 +535,7 @@ class IRCUnit < NSObject
       change_nick(s.token!)
     when :away
       send(cmd, s)
-    when :mode,:invite
+    when :invite
       send(cmd, target, s)
     when :whois
       if s.include?(' ')
