@@ -423,12 +423,6 @@ class IRCUnit < NSObject
       else
         return s.token!
       end
-    when :ban
-      if channel_is_selected?(sel) && !s.modechannelname?
-        return sel.name
-      else
-        return s.token!
-      end    
     end
   end
 
@@ -579,6 +573,7 @@ class IRCUnit < NSObject
     return MeCommand.new(self) if (cmd == :me)
     return KickCommand.new(self) if (cmd == :kick)
     return InviteCommand.new(self) if (cmd == :invite)
+    return BanCommand.new(self) if (cmd == :ban)    
 
     if (cmd == :op)
       return SetUserPrivilegeCommand.new(self,  :cmd => :op, 
@@ -628,17 +623,6 @@ class IRCUnit < NSObject
                                                 :clear_privilege => true, 
                                                 :help_text => '<mask> - removes channel ban from the specified mask (nick!username@hostname)')
     end
-
-
-
-                                          
-
-=begin
-    return OpCommand.new(self) if (cmd == :op)
-    return DeopCommand.new(self) if (cmd == :deop)
-    return VoiceCommand.new(self) if (cmd == :voice)
-    return DevoiceCommand.new(self) if (cmd == :devoice)
-=ebd
     
 =begin
     return PrivMsgCommand
@@ -700,25 +684,6 @@ class IRCUnit < NSObject
     
     ## special case, from get_target:
     case cmd
-    when :ban
-      command = cmd.to_s
-      if command =~ /^(de|un)/
-        sign = '-'
-        command[0..1] = ''
-      else
-        sign = '+'
-      end
-      params = s.split(/ +/)
-      if params.empty?
-        if cmd == :ban
-          s = '+b'
-        else
-          return true
-        end
-      else
-        s = sign + command[0,1] * params.size + ' ' + s
-      end
-      cmd = :mode
     when :umode
       cmd = :mode
       s = @mynick      
