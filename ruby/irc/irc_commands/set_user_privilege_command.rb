@@ -4,13 +4,17 @@ Base class for commands that set user privilieges (eg: :op, :deop etc)
 class SetUserPrivilegeCommand
   def initialize(unit, options = {})
     @unit = unit
+    @command = options[:command]
+    @help_text = options[:help_text] || 'no help available'
+    @aliases = options[:aliases] || []
+
     @mode_command = options[:privilege]
     @privilege_modifier = '+' if options[:set_privilege]
     @privilege_modifier = '-' if options[:clear_privilege]                                                         
   end
 
   def help
-    "/#{command_and_aliases} - help information not available"
+    "/#{command_and_aliases} - #{@help_text}"
   end
 
   def command_and_aliases
@@ -20,11 +24,11 @@ class SetUserPrivilegeCommand
   end
 
   def aliases
-    []
+    @aliases
   end
 
   def command
-    :not_set
+    @command
   end
 
   def opmsg?

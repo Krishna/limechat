@@ -579,10 +579,44 @@ class IRCUnit < NSObject
     return MeCommand.new(self) if (cmd == :me)
     return KickCommand.new(self) if (cmd == :kick)
     return InviteCommand.new(self) if (cmd == :invite)
+
+    if (cmd == :op)
+      return SetUserPrivilegeCommand.new(self,  :cmd => :op, 
+                                                :privilege => 'o', 
+                                                :set_privilege => true, 
+                                                :help_text => '<nick> [<nick> ...] - promotes the specified user nicks to operator status')
+    end
+
+    if (cmd == :deop)
+      return SetUserPrivilegeCommand.new(self,  :cmd => :deop, 
+                                                :privilege => 'o', 
+                                                :clear_privilege => true, 
+                                                :help_text => '<nick> [<nick> ...] - removes operator status from the specified user nicks')
+    end
+
+    if (cmd == :voice)
+      return SetUserPrivilegeCommand.new(self,  :cmd => :voice, 
+                                                :privilege => 'v', 
+                                                :set_privilege => true, 
+                                                :help_text => '<nick> [<nick> ...] - promotes the specified user nicks to voiced status')
+    end
+
+    if (cmd == :devoice)
+      return SetUserPrivilegeCommand.new(self,  :cmd => :devoice, 
+                                                :privilege => 'v', 
+                                                :clear_privilege => true, 
+                                                :help_text => '<nick> [<nick> ...] - removes voiced status from the specified user nicks')
+    end
+
+
+                                          
+
+=begin
     return OpCommand.new(self) if (cmd == :op)
     return DeopCommand.new(self) if (cmd == :deop)
     return VoiceCommand.new(self) if (cmd == :voice)
     return DevoiceCommand.new(self) if (cmd == :devoice)
+=ebd
     
 =begin
     return PrivMsgCommand
