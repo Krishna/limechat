@@ -423,7 +423,7 @@ class IRCUnit < NSObject
       else
         return s.token!
       end
-    when :halfop,:dehalfop,:voice,:devoice,:ban,:unban
+    when :halfop,:dehalfop,:ban,:unban
       if channel_is_selected?(sel) && !s.modechannelname?
         return sel.name
       else
@@ -581,6 +581,8 @@ class IRCUnit < NSObject
     return InviteCommand.new(self) if (cmd == :invite)
     return OpCommand.new(self) if (cmd == :op)
     return DeopCommand.new(self) if (cmd == :deop)
+    return VoiceCommand.new(self) if (cmd == :voice)
+    return DevoiceCommand.new(self) if (cmd == :devoice)
     
 =begin
     return PrivMsgCommand
@@ -642,7 +644,7 @@ class IRCUnit < NSObject
     
     ## special case, from get_target:
     case cmd
-    when :halfop,:dehalfop,:voice,:devoice,:ban,:unban
+    when :halfop,:dehalfop,:ban,:unban
       command = cmd.to_s
       if command =~ /^(de|un)/
         sign = '-'
