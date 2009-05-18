@@ -423,7 +423,7 @@ class IRCUnit < NSObject
       else
         return s.token!
       end
-    when :halfop,:dehalfop,:ban,:unban
+    when :ban
       if channel_is_selected?(sel) && !s.modechannelname?
         return sel.name
       else
@@ -608,6 +608,28 @@ class IRCUnit < NSObject
                                                 :help_text => '<nick> [<nick> ...] - removes voiced status from the specified user nicks')
     end
 
+    if (cmd == :halfop)
+      return SetUserPrivilegeCommand.new(self,  :cmd => :halfop, 
+                                                :privilege => 'h', 
+                                                :set_privilege => true, 
+                                                :help_text => '<nick> [<nick> ...] - promotes the specified user nicks to halfop status')
+    end
+
+    if (cmd == :dehalfop)
+      return SetUserPrivilegeCommand.new(self,  :cmd => :dehalfop, 
+                                                :privilege => 'h', 
+                                                :clear_privilege => true, 
+                                                :help_text => '<nick> [<nick> ...] - removes halfop status from the specified user nicks')
+    end
+
+    if (cmd == :unban)
+      return SetUserPrivilegeCommand.new(self,  :cmd => :unban, 
+                                                :privilege => 'b', 
+                                                :clear_privilege => true, 
+                                                :help_text => '<mask> - removes channel ban from the specified mask (nick!username@hostname)')
+    end
+
+
 
                                           
 
@@ -678,7 +700,7 @@ class IRCUnit < NSObject
     
     ## special case, from get_target:
     case cmd
-    when :halfop,:dehalfop,:ban,:unban
+    when :ban
       command = cmd.to_s
       if command =~ /^(de|un)/
         sign = '-'
