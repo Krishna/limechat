@@ -1,64 +1,19 @@
-class OpCommand
+require 'set_user_privilege_command.rb'
+
+class OpCommand < SetUserPrivilegeCommand
   
   def initialize(unit, options = {})
-    @unit = unit
+    options[:privilege] = 'o'    
+    options[:set_privilege] = true
+    super(unit, options)    
   end
   
   def help
     "/#{command_and_aliases} <nick> [<nick> ...] - promotes the specified user nicks to operator status"
   end
-  
-  def command_and_aliases
-    c = "/#{command}"
-    a = aliases.collect {|a| "/#{a}" }
-    [c, a].join(' | ')
-  end
-  
-  def aliases
-    []
-  end
-  
+    
   def command
     :op
   end
-  
-  def opmsg?
-    false
-  end
-  
-  def channel_is_selected?(sel)
-    sel && sel.channel?
-  end
 
-  def talk_is_selected?(sel)
-    sel && sel.talk?
-  end
-  
-  def get_target(cmd_string, sel)
-    return sel.name if channel_is_selected?(sel) && !cmd_string.modechannelname?
-    cmd_string.token!
-  end
-  
-  def cut_colon!(cmd_string)
-    if cmd_string[0] == ?:
-      cmd_string[0] = ''
-      return true
-    end
-    return false
-  end  
-  
-  # TODO: can we eliminate complete_target and target from the method signature?
-  def execute(cmd_string, complete_target = true, target = nil, sel = nil)
-    DebugTools.log_outbound_command(self.command, cmd_string, complete_target, target)
-
-    target = get_target(cmd_string, sel) # note... this method will mutate cmd_string
-
-    params = cmd_string.split(/ +/)
-    return true if params.empty? # TODO output help text
-    
-    mode_command_string = "+" + ("o" * params.size) + ' ' + cmd_string    
-    @unit.send(:mode, target, mode_command_string)
-    return true    
-  end
-  
 end
