@@ -423,7 +423,7 @@ class IRCUnit < NSObject
       else
         return s.token!
       end
-    when :op,:deop,:halfop,:dehalfop,:voice,:devoice,:ban,:unban
+    when :deop,:halfop,:dehalfop,:voice,:devoice,:ban,:unban
       if channel_is_selected?(sel) && !s.modechannelname?
         return sel.name
       else
@@ -578,7 +578,8 @@ class IRCUnit < NSObject
     return JoinCommand.new(self, :invoked_command => cmd) if (cmd == :join || cmd == :j)
     return MeCommand.new(self) if (cmd == :me)
     return KickCommand.new(self) if (cmd == :kick)
-    return InviteCommand.new(self) if (cmd == :invite)            
+    return InviteCommand.new(self) if (cmd == :invite)
+    return OpCommand.new(self) if (cmd == :op)            
     
 =begin
     return PrivMsgCommand
@@ -640,7 +641,7 @@ class IRCUnit < NSObject
     
     ## special case, from get_target:
     case cmd
-    when :op,:deop,:halfop,:dehalfop,:voice,:devoice,:ban,:unban
+    when :deop,:halfop,:dehalfop,:voice,:devoice,:ban,:unban
       command = cmd.to_s
       if command =~ /^(de|un)/
         sign = '-'
@@ -755,6 +756,7 @@ class IRCUnit < NSObject
   end
   
   def send(command, *args)
+printf("-- send | command: %s | argument: %s\n", command, args.join(', '))     
     return unless connected?
     m = IRCSendingMessage.new(command, *args)
     if block_given?

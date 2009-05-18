@@ -1,11 +1,11 @@
-class ModeCommand
+class OpCommand
   
   def initialize(unit, options = {})
     @unit = unit
   end
   
   def help
-    "/#{command_and_aliases} [<channel>|<nick>] <modes> - changes the user or channel mode"
+    "/#{command_and_aliases} <nick> [<nick> ...] - promotes the specified user nicks to operator status"
   end
   
   def command_and_aliases
@@ -19,7 +19,7 @@ class ModeCommand
   end
   
   def command
-    :mode
+    :op
   end
   
   def opmsg?
@@ -46,17 +46,19 @@ class ModeCommand
     end
     return false
   end  
-    
+  
   # TODO: can we eliminate complete_target and target from the method signature?
   def execute(cmd_string, complete_target = true, target = nil, sel = nil)
     DebugTools.log_outbound_command(self.command, cmd_string, complete_target, target)
 
     target = get_target(cmd_string, sel) # note... this method will mutate cmd_string
-    cut_colon = cut_colon!(cmd_string)        
 
-    @unit.send(self.command, target, cmd_string)
-
-    return true
+    params = cmd_string.split(/ +/)
+    return true if params.empty? # TODO output help text
+    
+    mode_command_string = "+" + ("o" * params.size) + ' ' + cmd_string    
+    @unit.send(:mode, target, mode_command_string)
+    return true    
   end
   
 end
