@@ -410,7 +410,7 @@ class IRCUnit < NSObject
   # side-effects on: s
   def get_target(cmd, s, opmsg, sel)
     case cmd
-    when :privmsg,:action
+    when :privmsg
       if opmsg
         if channel_is_selected?(sel) && !s.channelname?
           return sel.name
@@ -458,7 +458,7 @@ class IRCUnit < NSObject
 
   def action_cmd(cmd, s, target, opmsg, cut_colon)
     case cmd
-    when :privmsg, :action
+    when :privmsg
       return false unless target
       return false if s.empty?
       s = to_local_encoding(to_common_encoding(s))
@@ -567,12 +567,14 @@ class IRCUnit < NSObject
     return PartCommand.new(self, :invoked_command => cmd) if (cmd == :part || cmd == :leave)
     return TopicCommand.new(self, :invoked_command => cmd) if (cmd == :topic || cmd == :t)
     return JoinCommand.new(self, :invoked_command => cmd) if (cmd == :join || cmd == :j)
-    return MeCommand.new(self) if (cmd == :me)
-    return KickCommand.new(self) if (cmd == :kick)
-    return InviteCommand.new(self) if (cmd == :invite)
-    return BanCommand.new(self) if (cmd == :ban)
-    return NoticeCommand.new(self) if (cmd == :notice)
-    return OnoticeCommand.new(self)  if (cmd == :onotice)
+    return MeCommand.new(self)      if (cmd == :me)
+    return KickCommand.new(self)    if (cmd == :kick)
+    return InviteCommand.new(self)  if (cmd == :invite)
+    return BanCommand.new(self)     if (cmd == :ban)
+    return NoticeCommand.new(self)  if (cmd == :notice)
+    return OnoticeCommand.new(self) if (cmd == :onotice)
+    return OnoticeCommand.new(self) if (cmd == :onotice)
+    return ActionCommand.new(self)  if (cmd == :action)    
 
     if (cmd == :op)
       return SetUserPrivilegeCommand.new(self,  :cmd => :op, 
