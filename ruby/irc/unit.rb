@@ -388,19 +388,10 @@ class IRCUnit < NSObject
   end
 
 
-  # TODO: eliminate this method stub: resolve_aliases
-  def resolve_aliases(cmd)    
-    return [false, cmd]
-  end  
-
   def channel_is_selected?(sel)
     sel && sel.channel?
   end
 
-  # TODO: eliminate this method stub: get_target
-  # side-effects on: s
-  def get_target(cmd, s, opmsg, sel)
-  end
 
   def cut_colon!(s)
     if s[0] == ?:
@@ -510,7 +501,9 @@ printf("all_outbound_commands | cmd: %s\n", cmd)
     return OnoticeCommand.new(self) if (cmd == :onotice)
     return ActionCommand.new(self)  if (cmd == :action)
     return PrivmsgCommand.new(self) if (cmd == :privmsg || cmd == :msg || cmd == :m)
-    return OmsgCommand.new(self)    if (cmd == :omsg)    
+    return OmsgCommand.new(self)    if (cmd == :omsg)
+    return ModeCommand.new(self)    if (cmd == :mode)
+    return UmodeCommand.new(self)   if (cmd == :umode)
 
     if (cmd == :op)
       return SetUserPrivilegeCommand.new(self,  :cmd => :op, 
@@ -610,17 +603,16 @@ printf("cmd_to_execute:%s\n", cmd_to_execute.class)
     target = nil
     sel = pick_sel(complete_target, target)
     
-    opmsg = false
-    opmsg, cmd = resolve_aliases(cmd)    
+    opmsg = false    
          
-    target = get_target(cmd, s, opmsg, sel) # note... this method will mutate s
-    
+=begin    
     ## special case, from get_target:
     case cmd
     when :umode
       cmd = :mode
       s = @mynick      
     end
+=end
     
     cut_colon = cut_colon!(s)        
     
