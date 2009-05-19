@@ -413,7 +413,7 @@ class IRCUnit < NSObject
   # side-effects on: s
   def get_target(cmd, s, opmsg, sel)
     case cmd
-    when :privmsg,:notice,:action
+    when :privmsg,:action
       if opmsg
         if channel_is_selected?(sel) && !s.channelname?
           return sel.name
@@ -437,7 +437,7 @@ class IRCUnit < NSObject
 
   # side-effect: s, target
   def process_text_commands(cmd, s, target)
-    if cmd == :privmsg || cmd == :notice
+    if cmd == :privmsg
       if s[0] == 0x1
         cmd = (cmd == :privmsg) ? :ctcp : :ctcpreply
         s[0] = ''
@@ -461,7 +461,7 @@ class IRCUnit < NSObject
 
   def action_cmd(cmd, s, target, opmsg, cut_colon)
     case cmd
-    when :privmsg,:notice,:action
+    when :privmsg, :action
       return false unless target
       return false if s.empty?
       s = to_local_encoding(to_common_encoding(s))
@@ -573,7 +573,8 @@ class IRCUnit < NSObject
     return MeCommand.new(self) if (cmd == :me)
     return KickCommand.new(self) if (cmd == :kick)
     return InviteCommand.new(self) if (cmd == :invite)
-    return BanCommand.new(self) if (cmd == :ban)    
+    return BanCommand.new(self) if (cmd == :ban)
+    return NoticeCommand.new(self) if (cmd == :notice)
 
     if (cmd == :op)
       return SetUserPrivilegeCommand.new(self,  :cmd => :op, 
