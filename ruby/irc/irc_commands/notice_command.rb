@@ -5,8 +5,7 @@ class NoticeCommand
   end
   
   def help
-    #TODO: put in a help message
-    "/#{command_and_aliases} ??????????"
+    "/#{command_and_aliases} <nick>|<channel> <text> - sends a private message to the specified <nick>"
   end
   
   def command_and_aliases
@@ -22,6 +21,11 @@ class NoticeCommand
   def command
     :notice
   end
+
+  def command_sent_over_wire
+    :notice
+  end
+
   
   def opmsg?
     false
@@ -36,7 +40,6 @@ class NoticeCommand
   end
   
   def get_target(cmd_string, sel)
-    # return sel.name if channel_is_selected?(sel) && !cmd_string.channelname?
     cmd_string.token!    
   end
   
@@ -106,7 +109,7 @@ class NoticeCommand
     target = get_target(cmd_string, sel) # note... this method will mutate cmd_string
     cut_colon = cut_colon!(cmd_string)        
 
-    cmd = self.command
+    cmd = self.command_sent_over_wire
     # extracted from process_text()...
     if cmd_string[0] == 0x1
       cmd = :ctcpreply

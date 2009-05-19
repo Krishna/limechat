@@ -393,9 +393,6 @@ class IRCUnit < NSObject
     actual_cmd = cmd
     
     case cmd
-    when :onotice
-      opmsg = true
-      actual_cmd = :notice
     when :omsg
       opmsg = true
       actual_cmd = :privmsg
@@ -575,6 +572,7 @@ class IRCUnit < NSObject
     return InviteCommand.new(self) if (cmd == :invite)
     return BanCommand.new(self) if (cmd == :ban)
     return NoticeCommand.new(self) if (cmd == :notice)
+    return OnoticeCommand.new(self)  if (cmd == :onotice)
 
     if (cmd == :op)
       return SetUserPrivilegeCommand.new(self,  :cmd => :op, 
