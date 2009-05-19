@@ -409,7 +409,8 @@ class IRCUnit < NSObject
 
   # side-effects on: s
   def get_target(cmd, s, opmsg, sel)
-    case cmd
+=begin
+    case cmd      
     when :privmsg
       if opmsg
         if channel_is_selected?(sel) && !s.channelname?
@@ -421,6 +422,7 @@ class IRCUnit < NSObject
         return s.token!
       end
     end
+=end    
   end
 
   def cut_colon!(s)
@@ -434,6 +436,7 @@ class IRCUnit < NSObject
 
   # side-effect: s, target
   def process_text_commands(cmd, s, target)
+=begin    
     if cmd == :privmsg
       if s[0] == 0x1
         cmd = (cmd == :privmsg) ? :ctcp : :ctcpreply
@@ -442,6 +445,7 @@ class IRCUnit < NSObject
         s = s[0...n] if n
       end
     end
+=end
 
     if cmd == :ctcp
       t = s.dup
@@ -458,6 +462,7 @@ class IRCUnit < NSObject
 
   def action_cmd(cmd, s, target, opmsg, cut_colon)
     case cmd
+=begin      
     when :privmsg
       return false unless target
       return false if s.empty?
@@ -504,7 +509,7 @@ class IRCUnit < NSObject
 
         send(cmd, targets.join(','), t)
       end
-
+=end
     when :ctcp
       subcmd = s.token!
       unless subcmd.empty?
@@ -574,7 +579,8 @@ class IRCUnit < NSObject
     return NoticeCommand.new(self)  if (cmd == :notice)
     return OnoticeCommand.new(self) if (cmd == :onotice)
     return OnoticeCommand.new(self) if (cmd == :onotice)
-    return ActionCommand.new(self)  if (cmd == :action)    
+    return ActionCommand.new(self)  if (cmd == :action)
+    return PrivmsgCommand.new(self)  if (cmd == :privmsg)
 
     if (cmd == :op)
       return SetUserPrivilegeCommand.new(self,  :cmd => :op, 
