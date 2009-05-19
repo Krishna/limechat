@@ -393,9 +393,6 @@ class IRCUnit < NSObject
     actual_cmd = cmd
     
     case cmd
-    when :omsg
-      opmsg = true
-      actual_cmd = :privmsg
     when :msg,:m
       actual_cmd = :privmsg
     end
@@ -407,22 +404,9 @@ class IRCUnit < NSObject
     sel && sel.channel?
   end
 
+  # TODO: eliminate this method stub: get_target
   # side-effects on: s
   def get_target(cmd, s, opmsg, sel)
-=begin
-    case cmd      
-    when :privmsg
-      if opmsg
-        if channel_is_selected?(sel) && !s.channelname?
-          return sel.name
-        else
-          return s.token!
-        end
-      else
-        return s.token!
-      end
-    end
-=end    
   end
 
   def cut_colon!(s)
@@ -462,54 +446,6 @@ class IRCUnit < NSObject
 
   def action_cmd(cmd, s, target, opmsg, cut_colon)
     case cmd
-=begin      
-    when :privmsg
-      return false unless target
-      return false if s.empty?
-      s = to_local_encoding(to_common_encoding(s))
-
-      loop do
-        break if s.empty?
-        t = truncate_text(s, cmd, target)
-        break if t.empty?
-
-        targets = target.split(/,/)
-
-        targets.each do |chname|
-          next if chname.empty?
-
-          # support for @#channel
-          #
-          if chname =~ /^@/
-            chname.replace($~.post_match)
-            op_prefix = true
-          else
-            op_prefix = false
-          end
-
-          c = find_channel(chname)
-          if !c && !chname.channelname? && !eq(chname, 'NickServ') && !eq(chname, 'ChanServ')
-            c = @world.create_talk(self, chname)
-          end
-          print_both(c || chname, cmd, @mynick, t)
-
-          # support for @#channel and omsg/onotice
-          #
-          if chname.channelname?
-            if opmsg || op_prefix
-              chname.replace("@#{chname}")
-            end
-          end
-        end
-
-        if cmd == :action
-          cmd = :privmsg
-          t = "\x01ACTION #{t}\x01"
-        end
-
-        send(cmd, targets.join(','), t)
-      end
-=end
     when :ctcp
       subcmd = s.token!
       unless subcmd.empty?
@@ -581,6 +517,7 @@ class IRCUnit < NSObject
     return OnoticeCommand.new(self) if (cmd == :onotice)
     return ActionCommand.new(self)  if (cmd == :action)
     return PrivmsgCommand.new(self)  if (cmd == :privmsg)
+    return OmsgCommand.new(self)  if (cmd == :omsg)    
 
     if (cmd == :op)
       return SetUserPrivilegeCommand.new(self,  :cmd => :op, 

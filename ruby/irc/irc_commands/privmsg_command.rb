@@ -21,6 +21,10 @@ class PrivmsgCommand
   def command
     :privmsg
   end
+  
+  def command_sent_over_wire
+    self.command
+  end
 
 =begin
   def command_sent_over_wire
@@ -112,7 +116,7 @@ class PrivmsgCommand
     target = get_target(cmd_string, sel) # note... this method will mutate cmd_string
     cut_colon = cut_colon!(cmd_string)        
 
-    cmd = self.command
+    cmd = self.command_sent_over_wire
     # extracted from process_text()...
     if cmd_string[0] == 0x1
       cmd = :ctcp
