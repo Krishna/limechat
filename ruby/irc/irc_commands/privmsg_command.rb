@@ -15,7 +15,7 @@ class PrivmsgCommand
   end
   
   def aliases
-    []
+    [:msg,:m]
   end
   
   def command

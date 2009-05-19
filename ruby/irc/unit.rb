@@ -388,16 +388,9 @@ class IRCUnit < NSObject
   end
 
 
+  # TODO: eliminate this method stub: resolve_aliases
   def resolve_aliases(cmd)    
-    opmsg = false
-    actual_cmd = cmd
-    
-    case cmd
-    when :msg,:m
-      actual_cmd = :privmsg
-    end
-
-    return [opmsg, actual_cmd]
+    return [false, cmd]
   end  
 
   def channel_is_selected?(sel)
@@ -491,7 +484,7 @@ class IRCUnit < NSObject
   Returns nil if the symbol is not recognised
 =end
   def all_outbound_commands(cmd)
-    
+printf("all_outbound_commands | cmd: %s\n", cmd)    
     # the following are 'psuedo-commands'...    
     
     return ClearCommand.new(self) if cmd == :clear
@@ -516,8 +509,8 @@ class IRCUnit < NSObject
     return OnoticeCommand.new(self) if (cmd == :onotice)
     return OnoticeCommand.new(self) if (cmd == :onotice)
     return ActionCommand.new(self)  if (cmd == :action)
-    return PrivmsgCommand.new(self)  if (cmd == :privmsg)
-    return OmsgCommand.new(self)  if (cmd == :omsg)    
+    return PrivmsgCommand.new(self) if (cmd == :privmsg || cmd == :msg || cmd == :m)
+    return OmsgCommand.new(self)    if (cmd == :omsg)    
 
     if (cmd == :op)
       return SetUserPrivilegeCommand.new(self,  :cmd => :op, 
@@ -568,11 +561,6 @@ class IRCUnit < NSObject
                                                 :help_text => '<mask> - removes channel ban from the specified mask (nick!username@hostname)')
     end
     
-=begin
-    return PrivMsgCommand
-=end    
-    
-    
     return nil
   end
 
@@ -590,9 +578,10 @@ class IRCUnit < NSObject
     cmd = cmd_string.token!
     cmd = cmd.downcase.to_sym
     
-    printf("cmd: %s | cmd_string: %s\n", cmd, cmd_string)
+printf("cmd: %s | cmd_string: %s\n", cmd, cmd_string)
     	
     cmd_to_execute = all_outbound_commands(cmd)
+printf("cmd_to_execute:%s\n", cmd_to_execute.class)    
     if cmd_to_execute
       sel = pick_sel(complete_target, target)
       command_result = cmd_to_execute.execute(cmd_string, complete_target, target, sel)
