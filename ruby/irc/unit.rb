@@ -398,9 +398,6 @@ class IRCUnit < NSObject
 
   def action_cmd(cmd, s, target, opmsg, cut_colon)
     case cmd
-    when :ctcpreply
-      target = s.token!
-      send_ctcp_reply(target, s)
     when :away
       send(cmd, s)
     else
@@ -453,9 +450,10 @@ printf("all_outbound_commands | cmd: %s\n", cmd)
     return ModeCommand.new(self)    if (cmd == :mode)
     return UmodeCommand.new(self)   if (cmd == :umode)
     return CtcpCommand.new(self)    if (cmd == :ctcp)
-    return WhoisCommand.new(self)    if (cmd == :whois)
+    return WhoisCommand.new(self)   if (cmd == :whois)
     return QuitCommand.new(self)    if (cmd == :quit)
-    return NickCommand.new(self)    if (cmd == :nick)        
+    return NickCommand.new(self)    if (cmd == :nick)
+    return CtcpreplyCommand.new(self)   if (cmd == :ctcpreply)
 
     if (cmd == :op)
       return SetUserPrivilegeCommand.new(self,  :cmd => :op, 
