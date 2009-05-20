@@ -585,8 +585,6 @@ class IRCUnit < NSObject
   end
   
   def send(command, *args)
-#TODO: remove the logging in the Unit##send method
-printf("-- send | command: %s | argument: %s\n", command, args.join(', '))     
     return unless connected?
     m = IRCSendingMessage.new(command, *args)
     if block_given?
