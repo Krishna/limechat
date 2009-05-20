@@ -388,11 +388,6 @@ class IRCUnit < NSObject
   end
 
 
-  def channel_is_selected?(sel)
-    sel && sel.channel?
-  end
-
-
   def cut_colon!(s)
     if s[0] == ?:
       s[0] = ''
@@ -401,47 +396,8 @@ class IRCUnit < NSObject
     return false
   end
 
-
-  # side-effect: s, target
-  def process_text_commands(cmd, s, target)
-=begin    
-    if cmd == :privmsg
-      if s[0] == 0x1
-        cmd = (cmd == :privmsg) ? :ctcp : :ctcpreply
-        s[0] = ''
-        n = s.index("\x01")
-        s = s[0...n] if n
-      end
-    end
-=end
-=begin
-    if cmd == :ctcp
-      t = s.dup
-      subcmd = t.token!
-      if subcmd.downcase == 'action'
-        cmd = :action
-        s = t
-        target = s.token!
-      end
-    end
-=end
-    return [cmd, target]
-  end
-
   def action_cmd(cmd, s, target, opmsg, cut_colon)
     case cmd
-=begin
-    when :ctcp
-      subcmd = s.token!
-      unless subcmd.empty?
-        target = s.token!
-        if subcmd.downcase == 'ping'
-          send_ctcp_ping(target)
-        else
-          send_ctcp_query(target, "#{subcmd} #{s}")
-        end
-      end
-=end      
     when :ctcpreply
       target = s.token!
       send_ctcp_reply(target, s)
@@ -608,11 +564,8 @@ printf("cmd_to_execute:%s\n", cmd_to_execute.class)
     
     opmsg = false    
          
-    
     cut_colon = cut_colon!(s)        
     
-    cmd, target = process_text_commands(cmd, s, target)
-
     return action_cmd(cmd, s, target, opmsg, cut_colon)            
     
   end
