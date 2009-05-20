@@ -407,12 +407,6 @@ class IRCUnit < NSObject
       change_nick(s.token!)
     when :away
       send(cmd, s)
-    when :whois
-      if s.include?(' ')
-        send(cmd, s)
-      else
-        send(cmd, "#{s} #{s}")
-      end
     else
       s = ':' + s if cut_colon
       send_raw(cmd, s)
@@ -463,6 +457,7 @@ printf("all_outbound_commands | cmd: %s\n", cmd)
     return ModeCommand.new(self)    if (cmd == :mode)
     return UmodeCommand.new(self)   if (cmd == :umode)
     return CtcpCommand.new(self)    if (cmd == :ctcp)
+    return WhoisCommand.new(self)    if (cmd == :whois)
 
     if (cmd == :op)
       return SetUserPrivilegeCommand.new(self,  :cmd => :op, 
