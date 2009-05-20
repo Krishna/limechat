@@ -399,19 +399,20 @@ class IRCUnit < NSObject
   Returns UnknownCommand object if the symbol is not recognised
 =end
   def all_outbound_commands(cmd)
-    # the following are 'psuedo-commands'...    
     
+    # TODO: really we should be storing all the commands in a hash which we initialize in 
+    #       the Unit's constructor.
+        
     return ClearCommand.new(self) if cmd == :clear
     return CloseCommand.new(self) if cmd == :close
     return RawCommand.new(self, :invoked_command => cmd) if (cmd == :raw || cmd == :quote)
-      # TODO: resolve command aliases for the RejoinCommand earlier...
+    
     return RejoinCommand.new(self, :invoked_command => cmd) if ((cmd == :rejoin) || (cmd == :hop) || (cmd == :cycle))
     return RubyCommand.new(self) if cmd == :ruby
     return TimerCommand.new(self) if cmd == :timer    
     return WeightsCommand.new(self) if cmd == :weights
     return QueryCommand.new(self) if cmd == :query
     
-    # TODO: other, non-psuedo-commands to follow...
     return PartCommand.new(self, :invoked_command => cmd) if (cmd == :part || cmd == :leave)
     return TopicCommand.new(self, :invoked_command => cmd) if (cmd == :topic || cmd == :t)
     return JoinCommand.new(self, :invoked_command => cmd) if (cmd == :join || cmd == :j)

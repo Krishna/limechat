@@ -37,7 +37,7 @@ class UmodeCommand
         
   # TODO: can we eliminate complete_target and target from the method signature?
   def execute(cmd_string, complete_target = true, target = nil, sel = nil)
-    DebugTools.log_outbound_command(self.command, cmd_string, complete_target, target)
+    #DebugTools.log_outbound_command(self.command, cmd_string, complete_target, target)
 
     cmd_string = @unit.mynick      
     cut_colon = cut_colon!(cmd_string)        
