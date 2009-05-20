@@ -388,27 +388,6 @@ class IRCUnit < NSObject
   end
 
 
-  def cut_colon!(s)
-    if s[0] == ?:
-      s[0] = ''
-      return true
-    end
-    return false
-  end
-
-  def action_cmd(cmd, s, target, opmsg, cut_colon)
-    case cmd
-    when :away
-      send(cmd, s)
-    else
-      s = ':' + s if cut_colon
-      send_raw(cmd, s)
-    end  
-
-    true
-  end
-
-
   # timed_command should be an array of the form:
   #   [interval (integer), sel, cmd_to_execute (string)]
   def add_timed_command(timed_command)
@@ -417,10 +396,9 @@ class IRCUnit < NSObject
 
 =begin rdoc
   For a given symbol (cmd), returns the corresponding command object.
-  Returns nil if the symbol is not recognised
+  Returns UnknownCommand object if the symbol is not recognised
 =end
   def all_outbound_commands(cmd)
-printf("all_outbound_commands | cmd: %s\n", cmd)    
     # the following are 'psuedo-commands'...    
     
     return ClearCommand.new(self) if cmd == :clear
@@ -453,6 +431,7 @@ printf("all_outbound_commands | cmd: %s\n", cmd)
     return WhoisCommand.new(self)   if (cmd == :whois)
     return QuitCommand.new(self)    if (cmd == :quit)
     return NickCommand.new(self)    if (cmd == :nick)
+    return AwayCommand.new(self)    if (cmd == :away)    
     return CtcpreplyCommand.new(self)   if (cmd == :ctcpreply)
 
     if (cmd == :op)
@@ -504,61 +483,23 @@ printf("all_outbound_commands | cmd: %s\n", cmd)
                                                 :help_text => '<mask> - removes channel ban from the specified mask (nick!username@hostname)')
     end
     
-    return nil
+    return UnknownCommand.new(self, :command => cmd)
   end
 
-=begin rdoc
-  Tries to dispatch an outbound command. 
 
-  Returns: [command_was_recognised, command_return_code]
-    command_was_recognised - a boolean to indicate if the command was recognised and dispatched.
-    command_return_code - the return code from the command, if a command was dispatched. nil otherwise.    
-=end
-  def dispatch_outbound_command(cmd_string, complete_target=true, target=nil)
-    DebugTools.log_dispatch_outbound_command(cmd_string, complete_target, target)
-    	
+  def send_command(cmd_string, complete_target=true, target=nil)
+  	# DebugTools.log_send_command(cmd_string, complete_target, target)
+	
+    return false unless connected? && cmd_string && !cmd_string.include?("\0")
+
     cmd_string = cmd_string.dup
     cmd = cmd_string.token!
     cmd = cmd.downcase.to_sym
-    
-printf("cmd: %s | cmd_string: %s\n", cmd, cmd_string)
-    	
+        	
     cmd_to_execute = all_outbound_commands(cmd)
-printf("cmd_to_execute:%s\n", cmd_to_execute.class)    
-    if cmd_to_execute
-      sel = pick_sel(complete_target, target)
-      command_result = cmd_to_execute.execute(cmd_string, complete_target, target, sel)
-      return [true, command_result]
-    end
-    	
-    return [false, nil]
-  end
 
-  def send_command(s, complete_target=true, target=nil)
-  	DebugTools.log_send_command(s, complete_target, target)
-	
-    return false unless connected? && s && !s.include?("\0")
-    
-    command_was_handled, command_return_code = dispatch_outbound_command(s, complete_target, target)
-    return command_return_code if command_was_handled
-    
-    # command was not handled by the dispatcher, so carry on...
-    
-    s = s.dup
-    command = s.token!
-    return false if command.empty?
-    
-    cmd = command.downcase.to_sym
-    
-    target = nil
     sel = pick_sel(complete_target, target)
-    
-    opmsg = false    
-         
-    cut_colon = cut_colon!(s)        
-    
-    return action_cmd(cmd, s, target, opmsg, cut_colon)            
-    
+    return cmd_to_execute.execute(cmd_string, complete_target, target, sel)    	
   end
   
   
