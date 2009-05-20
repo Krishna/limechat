@@ -401,8 +401,6 @@ class IRCUnit < NSObject
     when :ctcpreply
       target = s.token!
       send_ctcp_reply(target, s)
-    when :nick
-      change_nick(s.token!)
     when :away
       send(cmd, s)
     else
@@ -456,7 +454,8 @@ printf("all_outbound_commands | cmd: %s\n", cmd)
     return UmodeCommand.new(self)   if (cmd == :umode)
     return CtcpCommand.new(self)    if (cmd == :ctcp)
     return WhoisCommand.new(self)    if (cmd == :whois)
-    return QuitCommand.new(self)    if (cmd == :quit)    
+    return QuitCommand.new(self)    if (cmd == :quit)
+    return NickCommand.new(self)    if (cmd == :nick)        
 
     if (cmd == :op)
       return SetUserPrivilegeCommand.new(self,  :cmd => :op, 
