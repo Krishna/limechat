@@ -414,7 +414,7 @@ class IRCUnit < NSObject
       end
     end
 =end
-
+=begin
     if cmd == :ctcp
       t = s.dup
       subcmd = t.token!
@@ -424,12 +424,13 @@ class IRCUnit < NSObject
         target = s.token!
       end
     end
-
+=end
     return [cmd, target]
   end
 
   def action_cmd(cmd, s, target, opmsg, cut_colon)
     case cmd
+=begin
     when :ctcp
       subcmd = s.token!
       unless subcmd.empty?
@@ -440,6 +441,7 @@ class IRCUnit < NSObject
           send_ctcp_query(target, "#{subcmd} #{s}")
         end
       end
+=end      
     when :ctcpreply
       target = s.token!
       send_ctcp_reply(target, s)
@@ -504,6 +506,7 @@ printf("all_outbound_commands | cmd: %s\n", cmd)
     return OmsgCommand.new(self)    if (cmd == :omsg)
     return ModeCommand.new(self)    if (cmd == :mode)
     return UmodeCommand.new(self)   if (cmd == :umode)
+    return CtcpCommand.new(self)    if (cmd == :ctcp)
 
     if (cmd == :op)
       return SetUserPrivilegeCommand.new(self,  :cmd => :op, 
@@ -605,14 +608,6 @@ printf("cmd_to_execute:%s\n", cmd_to_execute.class)
     
     opmsg = false    
          
-=begin    
-    ## special case, from get_target:
-    case cmd
-    when :umode
-      cmd = :mode
-      s = @mynick      
-    end
-=end
     
     cut_colon = cut_colon!(s)        
     
