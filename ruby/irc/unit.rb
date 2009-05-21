@@ -379,375 +379,123 @@ class IRCUnit < NSObject
           end
     return sel
   end
-  
-    
-  def resolve_aliases(cmd)    
-    opmsg = false
-    actual_cmd = cmd
-    
-    case cmd
-    when :omsg
-      opmsg = true
-      actual_cmd = :privmsg
-    when :onotice
-      opmsg = true
-      actual_cmd = :notice
-    when :msg,:m
-      actual_cmd = :privmsg
-    when :leave
-      actual_cmd = :part
-    when :j
-      actual_cmd = :join
-    when :t
-      actual_cmd = :topic
-    end
 
-    return [opmsg, actual_cmd]
-  end  
 
-=begin
-  Checks cmd to see if it a psuedocommand. 
-  If cmd is a psuedocommand it is handled and the method returns: true.
-  Otherwise, returns false.
+  # timed_command should be an array of the form:
+  #   [interval (integer), sel, cmd_to_execute (string)]
+  def add_timed_command(timed_command)
+    @timer_queue << timed_command
+  end    
+
+=begin rdoc
+  For a given symbol (cmd), returns the corresponding command object.
+  Returns UnknownCommand object if the symbol is not recognised
 =end
-  def handle_pseudo_command(cmd, s)
-    case cmd
-    when :ruby
-      c = @world.selchannel || self
-      if s.empty?
-        print_both(c, :error_reply, "Input ruby expressions to execute")
-      else
-        begin
-          result = eval(s).inspect
-        rescue SyntaxError => e          
-		      send_text(c, :privmsg, "syntax error >> #{s}")
-        rescue Exception => e
-	        send_text(c, :privmsg, "exception #{e} >> #{s}")
-        else
-		      send_text(c, :privmsg, "=> #{result}")
-        end
-      end
-      return true
-		when :clear
-			u, c = @world.sel
-			if c
-				c.log.clear
-			elsif u
-				u.log.clear
-			end
-			return true
-    when :weights
-      sel = @world.selchannel
-      if sel
-        print_both(self, :reply, "WEIGHTS: ") 
-        sel.members.each do |m|
-          if m.weight > 0
-            out = "#{m.nick} - sent: #{m.incoming_weight} received: #{m.outgoing_weight} total: #{m.weight}" 
-            print_both(self, :reply, out) 
-          end
-        end
-      end
-      return true
-    when :query
-      target = s.token!
-      if target.empty?
-		    print_both(self, :error_reply, "query command needs a nick parameter. It will open a new window and start a private chat.") 
-      else
-        # open a new talk
-        c = find_channel(target)
-        unless c
-          @world.clear_text
-          c = @world.create_talk(self, target)
-        end
-        @world.select(c)
-      end
-      return true
-    when :close
-      target = s.token!
-      if target.empty?
-        c = @world.selchannel
-      else
-        c = find_channel(target)
-      end
-      if c && c.talk?
-        @world.destroy_channel(c)
-      end
-      return true
-    when :timer
-      interval = s.token!
-      if interval =~ /^\d+$/
-        @timer_queue << [interval.to_i, sel, s]
-      else
-        print_both(self, :error_reply, "timer command needs interval as a number") 
-      end
-      return true
-    when :rejoin,:hop,:cycle
-      c = @world.selchannel
-      if c
-        pass = c.mode.k
-        pass = nil if pass.empty?
-        part_channel(c)
-        join_channel(c, pass, true)
-      end
-      return true
-    when :raw,:quote
-      send_raw(s.token!, s)
-      return true
-    end    
-    
-    return false
-  end
+  def all_outbound_commands(cmd)
 
+    # TODO: really we should be storing all the commands in a hash which we initialize in 
+    #       the Unit's constructor.
 
-  # side-effects on: s
-  def get_target(cmd, s, opmsg, sel)
-    case cmd
-    when :privmsg,:notice,:action
-      if opmsg
-        if sel && sel.channel? && !s.channelname?
-          return sel.name
-        else
-          return s.token!
-        end
-      else
-        return s.token!
-      end
-    when :me
-      cmd = :action
-      if sel
-        return sel.name
-      else
-        return s.token!
-      end
-    when :part
-      if sel && sel.channel? && !s.channelname?
-        return sel.name
-      else
-        return s.token!
-      end
-    when :topic
-      if sel && sel.channel? && !s.channelname?
-        return sel.name
-      else
-        return s.token!
-      end
-    when :mode,:kick
-      if sel && sel.channel? && !s.modechannelname?
-        return sel.name
-      else
-        return s.token!
-      end
-    when :join
-      if sel && sel.channel? && !sel.active? && s.empty?
-        return sel.name
-      else
-        target = s.token!
-        target = '#' + target unless target.channelname?
-        return target
-      end
-    when :invite
-      return s.token!
-    when :op,:deop,:halfop,:dehalfop,:voice,:devoice,:ban,:unban
-      if sel && sel.channel? && !s.modechannelname?
-        return sel.name
-      else
-        return s.token!
-      end    
-    end
-  end
+    return ClearCommand.new(self) if cmd == :clear
+    return CloseCommand.new(self) if cmd == :close
+    return RawCommand.new(self, :invoked_command => cmd) if (cmd == :raw || cmd == :quote)
 
-  def cut_colon!(s)
-    if s[0] == ?:
-      s[0] = ''
-      return true
-    end
-    return false
-  end
+    return RejoinCommand.new(self, :invoked_command => cmd) if ((cmd == :rejoin) || (cmd == :hop) || (cmd == :cycle))
+    return RubyCommand.new(self) if cmd == :ruby
+    return TimerCommand.new(self) if cmd == :timer    
+    return WeightsCommand.new(self) if cmd == :weights
+    return QueryCommand.new(self) if cmd == :query
 
+    return PartCommand.new(self, :invoked_command => cmd) if (cmd == :part || cmd == :leave)
+    return TopicCommand.new(self, :invoked_command => cmd) if (cmd == :topic || cmd == :t)
+    return JoinCommand.new(self, :invoked_command => cmd) if (cmd == :join || cmd == :j)
+    return MeCommand.new(self)      if (cmd == :me)
+    return KickCommand.new(self)    if (cmd == :kick)
+    return InviteCommand.new(self)  if (cmd == :invite)
+    return BanCommand.new(self)     if (cmd == :ban)
+    return NoticeCommand.new(self)  if (cmd == :notice)
+    return OnoticeCommand.new(self) if (cmd == :onotice)
+    return OnoticeCommand.new(self) if (cmd == :onotice)
+    return ActionCommand.new(self)  if (cmd == :action)
+    return PrivmsgCommand.new(self) if (cmd == :privmsg || cmd == :msg || cmd == :m)
+    return OmsgCommand.new(self)    if (cmd == :omsg)
+    return ModeCommand.new(self)    if (cmd == :mode)
+    return UmodeCommand.new(self)   if (cmd == :umode)
+    return CtcpCommand.new(self)    if (cmd == :ctcp)
+    return WhoisCommand.new(self)   if (cmd == :whois)
+    return QuitCommand.new(self)    if (cmd == :quit)
+    return NickCommand.new(self)    if (cmd == :nick)
+    return AwayCommand.new(self)    if (cmd == :away)    
+    return CtcpreplyCommand.new(self)   if (cmd == :ctcpreply)
 
-  # side-effect: s, target
-  def process_text_commands(cmd, s, target)
-    if cmd == :privmsg || cmd == :notice
-      if s[0] == 0x1
-        cmd = (cmd == :privmsg) ? :ctcp : :ctcpreply
-        s[0] = ''
-        n = s.index("\x01")
-        s = s[0...n] if n
-      end
+    if (cmd == :op)
+      return SetUserPrivilegeCommand.new(self,  :cmd => :op, 
+                                                :privilege => 'o', 
+                                                :set_privilege => true, 
+                                                :help_text => '<nick> [<nick> ...] - promotes the specified user nicks to operator status')
     end
 
-    if cmd == :ctcp
-      t = s.dup
-      subcmd = t.token!
-      if subcmd.downcase == 'action'
-        cmd = :action
-        s = t
-        target = s.token!
-      end
+    if (cmd == :deop)
+      return SetUserPrivilegeCommand.new(self,  :cmd => :deop, 
+                                                :privilege => 'o', 
+                                                :clear_privilege => true, 
+                                                :help_text => '<nick> [<nick> ...] - removes operator status from the specified user nicks')
     end
 
-    return [cmd, target]
+    if (cmd == :voice)
+      return SetUserPrivilegeCommand.new(self,  :cmd => :voice, 
+                                                :privilege => 'v', 
+                                                :set_privilege => true, 
+                                                :help_text => '<nick> [<nick> ...] - promotes the specified user nicks to voiced status')
+    end
+
+    if (cmd == :devoice)
+      return SetUserPrivilegeCommand.new(self,  :cmd => :devoice, 
+                                                :privilege => 'v', 
+                                                :clear_privilege => true, 
+                                                :help_text => '<nick> [<nick> ...] - removes voiced status from the specified user nicks')
+    end
+
+    if (cmd == :halfop)
+      return SetUserPrivilegeCommand.new(self,  :cmd => :halfop, 
+                                                :privilege => 'h', 
+                                                :set_privilege => true, 
+                                                :help_text => '<nick> [<nick> ...] - promotes the specified user nicks to halfop status')
+    end
+
+    if (cmd == :dehalfop)
+      return SetUserPrivilegeCommand.new(self,  :cmd => :dehalfop, 
+                                                :privilege => 'h', 
+                                                :clear_privilege => true, 
+                                                :help_text => '<nick> [<nick> ...] - removes halfop status from the specified user nicks')
+    end
+
+    if (cmd == :unban)
+      return SetUserPrivilegeCommand.new(self,  :cmd => :unban, 
+                                                :privilege => 'b', 
+                                                :clear_privilege => true, 
+                                                :help_text => '<mask> - removes channel ban from the specified mask (nick!username@hostname)')
+    end
+
+    return UnknownCommand.new(self, :command => cmd)
   end
 
-  def action_cmd(cmd, s, target, opmsg, cut_colon)
-    case cmd
-    when :privmsg,:notice,:action
-      return false unless target
-      return false if s.empty?
-      s = to_local_encoding(to_common_encoding(s))
 
-      loop do
-        break if s.empty?
-        t = truncate_text(s, cmd, target)
-        break if t.empty?
-
-        targets = target.split(/,/)
-
-        targets.each do |chname|
-          next if chname.empty?
-
-          # support for @#channel
-          #
-          if chname =~ /^@/
-            chname.replace($~.post_match)
-            op_prefix = true
-          else
-            op_prefix = false
-          end
-
-          c = find_channel(chname)
-          if !c && !chname.channelname? && !eq(chname, 'NickServ') && !eq(chname, 'ChanServ')
-            c = @world.create_talk(self, chname)
-          end
-          print_both(c || chname, cmd, @mynick, t)
-
-          # support for @#channel and omsg/onotice
-          #
-          if chname.channelname?
-            if opmsg || op_prefix
-              chname.replace("@#{chname}")
-            end
-          end
-        end
-
-        if cmd == :action
-          cmd = :privmsg
-          t = "\x01ACTION #{t}\x01"
-        end
-
-        send(cmd, targets.join(','), t)
-      end
-
-    when :ctcp
-      subcmd = s.token!
-      unless subcmd.empty?
-        target = s.token!
-        if subcmd.downcase == 'ping'
-          send_ctcp_ping(target)
-        else
-          send_ctcp_query(target, "#{subcmd} #{s}")
-        end
-      end
-    when :ctcpreply
-      target = s.token!
-      send_ctcp_reply(target, s)
-    when :quit
-      quit(s)
-    when :nick
-      change_nick(s.token!)
-    when :topic
-      if s.empty? && !cut_colon
-        send(cmd, target)
-      else
-        send(cmd, target, s)
-      end
-    when :part
-      send(cmd, target, s)
-    when :kick
-      peer = s.token!
-      send(:kick, target, peer, s)
-    when :away
-      send(cmd, s)
-    when :join,:mode,:invite
-      send(cmd, target, s)
-    when :whois
-      if s.include?(' ')
-        send(cmd, s)
-      else
-        send(cmd, "#{s} #{s}")
-      end
-    else
-      s = ':' + s if cut_colon
-      send_raw(cmd, s)
-    end  
-
-    true
-  end
-    
-  def send_command(s, complete_target=true, target=nil)
-	DebugTools.log_send_command(s, complete_target, target)
+  def send_command(cmd_string, complete_target=true, target=nil)
+  	# DebugTools.log_send_command(cmd_string, complete_target, target)
 	
-    return false unless connected? && s && !s.include?("\0")
-    
-    s = s.dup
-    command = s.token!
-    return false if command.empty?
-    
-    cmd = command.downcase.to_sym
+    return false unless connected? && cmd_string && !cmd_string.include?("\0")
 
-    target = nil    
+    cmd_string = cmd_string.dup
+    cmd = cmd_string.token!
+    cmd = cmd.downcase.to_sym
+        	
+    cmd_to_execute = all_outbound_commands(cmd)
+
     sel = pick_sel(complete_target, target)
-    
-    opmsg = false    
-    opmsg, cmd = resolve_aliases(cmd)
-        
-    return true if handle_pseudo_command(cmd, s)    
-    
-    ## special case, from get_target:    
-    if cmd == :part
-      if sel && sel.channel? && !s.channelname?
-      elsif sel && sel.talk? && !s.channelname?
-        @world.destroy_channel(sel)
-      else
-      end
-    end
-    
-    target = get_target(cmd, s, opmsg, sel) # note... this method will mutate s
-        
-    ## special case, from get_target:
-    case cmd
-    when :op,:deop,:halfop,:dehalfop,:voice,:devoice,:ban,:unban
-      command = cmd.to_s
-      if command =~ /^(de|un)/
-        sign = '-'
-        command[0..1] = ''
-      else
-        sign = '+'
-      end
-      params = s.split(/ +/)
-      if params.empty?
-        if cmd == :ban
-          s = '+b'
-        else
-          return true
-        end
-      else
-        s = sign + command[0,1] * params.size + ' ' + s
-      end
-      cmd = :mode
-    when :umode
-      cmd = :mode
-      s = @mynick      
-    end
-    
-    cut_colon = cut_colon!(s)
-      
-    cmd, target = process_text_commands(cmd, s, target)
-    
-    return action_cmd(cmd, s, target, opmsg, cut_colon)
-
+    return cmd_to_execute.execute(cmd_string, complete_target, target, sel)    	
   end
-  
+    
   
   # model
   
@@ -1092,7 +840,9 @@ class IRCUnit < NSObject
   end
   
   
-  private
+
+public
+  # made following two methods public for use by command objects...
   
   def to_common_encoding(s)
     s.dup
@@ -1120,6 +870,8 @@ class IRCUnit < NSObject
     NSString.stringWithCString_encoding(s, enc).to_s
 =end
   end
+
+private
   
   def reload_tree
     @world.reload_tree
@@ -1280,6 +1032,10 @@ class IRCUnit < NSObject
     end
     key
   end
+
+public
+
+  # Made print_both public, so that the command objects can use it.  
   
   def print_both(channel, kind, nick, text=nil, identified=nil)
     r = print_channel(channel, kind, nick, text, identified)
@@ -1288,6 +1044,8 @@ class IRCUnit < NSObject
     end
     r
   end
+
+private
   
   def print_system(channel, text)
     print_channel(channel, :system, text)

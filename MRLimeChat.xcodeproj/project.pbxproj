@@ -113,6 +113,38 @@
 		78F475930F15022000D05115 /* ns_user_defaults.rb in Resources */ = {isa = PBXBuildFile; fileRef = 78F475920F15022000D05115 /* ns_user_defaults.rb */; };
 		8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MainMenu.nib */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
+		D71732F60FC5963500DBAB46 /* action_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732D60FC5963500DBAB46 /* action_command.rb */; };
+		D71732F70FC5963500DBAB46 /* away_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732D70FC5963500DBAB46 /* away_command.rb */; };
+		D71732F80FC5963500DBAB46 /* ban_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732D80FC5963500DBAB46 /* ban_command.rb */; };
+		D71732F90FC5963500DBAB46 /* clear_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732D90FC5963500DBAB46 /* clear_command.rb */; };
+		D71732FA0FC5963500DBAB46 /* close_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732DA0FC5963500DBAB46 /* close_command.rb */; };
+		D71732FB0FC5963500DBAB46 /* ctcp_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732DB0FC5963500DBAB46 /* ctcp_command.rb */; };
+		D71732FC0FC5963500DBAB46 /* ctcpreply_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732DC0FC5963500DBAB46 /* ctcpreply_command.rb */; };
+		D71732FD0FC5963500DBAB46 /* deop_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732DD0FC5963500DBAB46 /* deop_command.rb */; };
+		D71732FE0FC5963500DBAB46 /* invite_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732DE0FC5963500DBAB46 /* invite_command.rb */; };
+		D71732FF0FC5963500DBAB46 /* join_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732DF0FC5963500DBAB46 /* join_command.rb */; };
+		D71733000FC5963500DBAB46 /* kick_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732E00FC5963500DBAB46 /* kick_command.rb */; };
+		D71733010FC5963500DBAB46 /* me_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732E10FC5963500DBAB46 /* me_command.rb */; };
+		D71733020FC5963500DBAB46 /* mode_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732E20FC5963500DBAB46 /* mode_command.rb */; };
+		D71733030FC5963500DBAB46 /* nick_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732E30FC5963500DBAB46 /* nick_command.rb */; };
+		D71733040FC5963500DBAB46 /* notice_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732E40FC5963500DBAB46 /* notice_command.rb */; };
+		D71733050FC5963500DBAB46 /* omsg_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732E50FC5963500DBAB46 /* omsg_command.rb */; };
+		D71733060FC5963500DBAB46 /* onotice_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732E60FC5963500DBAB46 /* onotice_command.rb */; };
+		D71733070FC5963500DBAB46 /* op_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732E70FC5963500DBAB46 /* op_command.rb */; };
+		D71733080FC5963500DBAB46 /* part_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732E80FC5963500DBAB46 /* part_command.rb */; };
+		D71733090FC5963500DBAB46 /* privmsg_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732E90FC5963500DBAB46 /* privmsg_command.rb */; };
+		D717330A0FC5963500DBAB46 /* query_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732EA0FC5963500DBAB46 /* query_command.rb */; };
+		D717330B0FC5963500DBAB46 /* quit_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732EB0FC5963500DBAB46 /* quit_command.rb */; };
+		D717330C0FC5963500DBAB46 /* raw_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732EC0FC5963500DBAB46 /* raw_command.rb */; };
+		D717330D0FC5963500DBAB46 /* rejoin_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732ED0FC5963500DBAB46 /* rejoin_command.rb */; };
+		D717330E0FC5963500DBAB46 /* ruby_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732EE0FC5963500DBAB46 /* ruby_command.rb */; };
+		D717330F0FC5963500DBAB46 /* set_user_privilege_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732EF0FC5963500DBAB46 /* set_user_privilege_command.rb */; };
+		D71733100FC5963500DBAB46 /* timer_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732F00FC5963500DBAB46 /* timer_command.rb */; };
+		D71733110FC5963500DBAB46 /* topic_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732F10FC5963500DBAB46 /* topic_command.rb */; };
+		D71733120FC5963500DBAB46 /* umode_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732F20FC5963500DBAB46 /* umode_command.rb */; };
+		D71733130FC5963500DBAB46 /* unknown_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732F30FC5963500DBAB46 /* unknown_command.rb */; };
+		D71733140FC5963500DBAB46 /* weights_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732F40FC5963500DBAB46 /* weights_command.rb */; };
+		D71733150FC5963500DBAB46 /* whois_command.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71732F50FC5963500DBAB46 /* whois_command.rb */; };
 		D71928370FB22E01000D7B5D /* debug_tools.rb in Resources */ = {isa = PBXBuildFile; fileRef = D71928360FB22E01000D7B5D /* debug_tools.rb */; };
 /* End PBXBuildFile section */
 
@@ -234,6 +266,38 @@
 		78F475920F15022000D05115 /* ns_user_defaults.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = ns_user_defaults.rb; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* MRLimeChat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MRLimeChat.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D71732D60FC5963500DBAB46 /* action_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = action_command.rb; path = irc_commands/action_command.rb; sourceTree = "<group>"; };
+		D71732D70FC5963500DBAB46 /* away_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = away_command.rb; path = irc_commands/away_command.rb; sourceTree = "<group>"; };
+		D71732D80FC5963500DBAB46 /* ban_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = ban_command.rb; path = irc_commands/ban_command.rb; sourceTree = "<group>"; };
+		D71732D90FC5963500DBAB46 /* clear_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = clear_command.rb; path = irc_commands/clear_command.rb; sourceTree = "<group>"; };
+		D71732DA0FC5963500DBAB46 /* close_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = close_command.rb; path = irc_commands/close_command.rb; sourceTree = "<group>"; };
+		D71732DB0FC5963500DBAB46 /* ctcp_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = ctcp_command.rb; path = irc_commands/ctcp_command.rb; sourceTree = "<group>"; };
+		D71732DC0FC5963500DBAB46 /* ctcpreply_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = ctcpreply_command.rb; path = irc_commands/ctcpreply_command.rb; sourceTree = "<group>"; };
+		D71732DD0FC5963500DBAB46 /* deop_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = deop_command.rb; path = irc_commands/deop_command.rb; sourceTree = "<group>"; };
+		D71732DE0FC5963500DBAB46 /* invite_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = invite_command.rb; path = irc_commands/invite_command.rb; sourceTree = "<group>"; };
+		D71732DF0FC5963500DBAB46 /* join_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = join_command.rb; path = irc_commands/join_command.rb; sourceTree = "<group>"; };
+		D71732E00FC5963500DBAB46 /* kick_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = kick_command.rb; path = irc_commands/kick_command.rb; sourceTree = "<group>"; };
+		D71732E10FC5963500DBAB46 /* me_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = me_command.rb; path = irc_commands/me_command.rb; sourceTree = "<group>"; };
+		D71732E20FC5963500DBAB46 /* mode_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = mode_command.rb; path = irc_commands/mode_command.rb; sourceTree = "<group>"; };
+		D71732E30FC5963500DBAB46 /* nick_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = nick_command.rb; path = irc_commands/nick_command.rb; sourceTree = "<group>"; };
+		D71732E40FC5963500DBAB46 /* notice_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = notice_command.rb; path = irc_commands/notice_command.rb; sourceTree = "<group>"; };
+		D71732E50FC5963500DBAB46 /* omsg_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = omsg_command.rb; path = irc_commands/omsg_command.rb; sourceTree = "<group>"; };
+		D71732E60FC5963500DBAB46 /* onotice_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = onotice_command.rb; path = irc_commands/onotice_command.rb; sourceTree = "<group>"; };
+		D71732E70FC5963500DBAB46 /* op_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = op_command.rb; path = irc_commands/op_command.rb; sourceTree = "<group>"; };
+		D71732E80FC5963500DBAB46 /* part_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = part_command.rb; path = irc_commands/part_command.rb; sourceTree = "<group>"; };
+		D71732E90FC5963500DBAB46 /* privmsg_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = privmsg_command.rb; path = irc_commands/privmsg_command.rb; sourceTree = "<group>"; };
+		D71732EA0FC5963500DBAB46 /* query_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = query_command.rb; path = irc_commands/query_command.rb; sourceTree = "<group>"; };
+		D71732EB0FC5963500DBAB46 /* quit_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = quit_command.rb; path = irc_commands/quit_command.rb; sourceTree = "<group>"; };
+		D71732EC0FC5963500DBAB46 /* raw_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = raw_command.rb; path = irc_commands/raw_command.rb; sourceTree = "<group>"; };
+		D71732ED0FC5963500DBAB46 /* rejoin_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = rejoin_command.rb; path = irc_commands/rejoin_command.rb; sourceTree = "<group>"; };
+		D71732EE0FC5963500DBAB46 /* ruby_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = ruby_command.rb; path = irc_commands/ruby_command.rb; sourceTree = "<group>"; };
+		D71732EF0FC5963500DBAB46 /* set_user_privilege_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = set_user_privilege_command.rb; path = irc_commands/set_user_privilege_command.rb; sourceTree = "<group>"; };
+		D71732F00FC5963500DBAB46 /* timer_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = timer_command.rb; path = irc_commands/timer_command.rb; sourceTree = "<group>"; };
+		D71732F10FC5963500DBAB46 /* topic_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = topic_command.rb; path = irc_commands/topic_command.rb; sourceTree = "<group>"; };
+		D71732F20FC5963500DBAB46 /* umode_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = umode_command.rb; path = irc_commands/umode_command.rb; sourceTree = "<group>"; };
+		D71732F30FC5963500DBAB46 /* unknown_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = unknown_command.rb; path = irc_commands/unknown_command.rb; sourceTree = "<group>"; };
+		D71732F40FC5963500DBAB46 /* weights_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = weights_command.rb; path = irc_commands/weights_command.rb; sourceTree = "<group>"; };
+		D71732F50FC5963500DBAB46 /* whois_command.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = whois_command.rb; path = irc_commands/whois_command.rb; sourceTree = "<group>"; };
 		D71928360FB22E01000D7B5D /* debug_tools.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = debug_tools.rb; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -409,6 +473,38 @@
 		78B4B3E40ED932CA00622588 /* irc */ = {
 			isa = PBXGroup;
 			children = (
+				D71732D60FC5963500DBAB46 /* action_command.rb */,
+				D71732D70FC5963500DBAB46 /* away_command.rb */,
+				D71732D80FC5963500DBAB46 /* ban_command.rb */,
+				D71732D90FC5963500DBAB46 /* clear_command.rb */,
+				D71732DA0FC5963500DBAB46 /* close_command.rb */,
+				D71732DB0FC5963500DBAB46 /* ctcp_command.rb */,
+				D71732DC0FC5963500DBAB46 /* ctcpreply_command.rb */,
+				D71732DD0FC5963500DBAB46 /* deop_command.rb */,
+				D71732DE0FC5963500DBAB46 /* invite_command.rb */,
+				D71732DF0FC5963500DBAB46 /* join_command.rb */,
+				D71732E00FC5963500DBAB46 /* kick_command.rb */,
+				D71732E10FC5963500DBAB46 /* me_command.rb */,
+				D71732E20FC5963500DBAB46 /* mode_command.rb */,
+				D71732E30FC5963500DBAB46 /* nick_command.rb */,
+				D71732E40FC5963500DBAB46 /* notice_command.rb */,
+				D71732E50FC5963500DBAB46 /* omsg_command.rb */,
+				D71732E60FC5963500DBAB46 /* onotice_command.rb */,
+				D71732E70FC5963500DBAB46 /* op_command.rb */,
+				D71732E80FC5963500DBAB46 /* part_command.rb */,
+				D71732E90FC5963500DBAB46 /* privmsg_command.rb */,
+				D71732EA0FC5963500DBAB46 /* query_command.rb */,
+				D71732EB0FC5963500DBAB46 /* quit_command.rb */,
+				D71732EC0FC5963500DBAB46 /* raw_command.rb */,
+				D71732ED0FC5963500DBAB46 /* rejoin_command.rb */,
+				D71732EE0FC5963500DBAB46 /* ruby_command.rb */,
+				D71732EF0FC5963500DBAB46 /* set_user_privilege_command.rb */,
+				D71732F00FC5963500DBAB46 /* timer_command.rb */,
+				D71732F10FC5963500DBAB46 /* topic_command.rb */,
+				D71732F20FC5963500DBAB46 /* umode_command.rb */,
+				D71732F30FC5963500DBAB46 /* unknown_command.rb */,
+				D71732F40FC5963500DBAB46 /* weights_command.rb */,
+				D71732F50FC5963500DBAB46 /* whois_command.rb */,
 				78B4B3E50ED932CA00622588 /* channel.rb */,
 				78B4B3E60ED932CA00622588 /* channelmode.rb */,
 				78B4B3E70ED932CA00622588 /* config.rb */,
@@ -634,6 +730,38 @@
 				78A376AA0F1726BF002CD1A4 /* redstar.tiff in Resources */,
 				78A376AB0F1726BF002CD1A4 /* bluestar.tiff in Resources */,
 				D71928370FB22E01000D7B5D /* debug_tools.rb in Resources */,
+				D71732F60FC5963500DBAB46 /* action_command.rb in Resources */,
+				D71732F70FC5963500DBAB46 /* away_command.rb in Resources */,
+				D71732F80FC5963500DBAB46 /* ban_command.rb in Resources */,
+				D71732F90FC5963500DBAB46 /* clear_command.rb in Resources */,
+				D71732FA0FC5963500DBAB46 /* close_command.rb in Resources */,
+				D71732FB0FC5963500DBAB46 /* ctcp_command.rb in Resources */,
+				D71732FC0FC5963500DBAB46 /* ctcpreply_command.rb in Resources */,
+				D71732FD0FC5963500DBAB46 /* deop_command.rb in Resources */,
+				D71732FE0FC5963500DBAB46 /* invite_command.rb in Resources */,
+				D71732FF0FC5963500DBAB46 /* join_command.rb in Resources */,
+				D71733000FC5963500DBAB46 /* kick_command.rb in Resources */,
+				D71733010FC5963500DBAB46 /* me_command.rb in Resources */,
+				D71733020FC5963500DBAB46 /* mode_command.rb in Resources */,
+				D71733030FC5963500DBAB46 /* nick_command.rb in Resources */,
+				D71733040FC5963500DBAB46 /* notice_command.rb in Resources */,
+				D71733050FC5963500DBAB46 /* omsg_command.rb in Resources */,
+				D71733060FC5963500DBAB46 /* onotice_command.rb in Resources */,
+				D71733070FC5963500DBAB46 /* op_command.rb in Resources */,
+				D71733080FC5963500DBAB46 /* part_command.rb in Resources */,
+				D71733090FC5963500DBAB46 /* privmsg_command.rb in Resources */,
+				D717330A0FC5963500DBAB46 /* query_command.rb in Resources */,
+				D717330B0FC5963500DBAB46 /* quit_command.rb in Resources */,
+				D717330C0FC5963500DBAB46 /* raw_command.rb in Resources */,
+				D717330D0FC5963500DBAB46 /* rejoin_command.rb in Resources */,
+				D717330E0FC5963500DBAB46 /* ruby_command.rb in Resources */,
+				D717330F0FC5963500DBAB46 /* set_user_privilege_command.rb in Resources */,
+				D71733100FC5963500DBAB46 /* timer_command.rb in Resources */,
+				D71733110FC5963500DBAB46 /* topic_command.rb in Resources */,
+				D71733120FC5963500DBAB46 /* umode_command.rb in Resources */,
+				D71733130FC5963500DBAB46 /* unknown_command.rb in Resources */,
+				D71733140FC5963500DBAB46 /* weights_command.rb in Resources */,
+				D71733150FC5963500DBAB46 /* whois_command.rb in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
